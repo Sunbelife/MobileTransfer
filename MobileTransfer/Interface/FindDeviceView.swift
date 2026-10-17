@@ -198,8 +198,7 @@ private struct UnregisteredDeviceView: View {
             .contentShape(Rectangle())
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(16)
-            .background(.background.opacity(0.5))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .itmGlassSurface(cornerRadius: 18, interactive: true)
         }
         .buttonStyle(.plain)
     }

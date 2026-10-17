@@ -11,12 +11,7 @@ struct WelcomeView: View {
                 .font(.system(size: 45, weight: .light))
                 .foregroundStyle(.primary)
                 .frame(width: 80, height: 80)
-                .background(.background)
-                .clipShape(.rect(cornerRadius: 24))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 24)
-                        .strokeBorder(.primary.opacity(0.08), lineWidth: 1)
-                }
+                .itmGlassSurface(cornerRadius: 24)
 
             Text("iTM")
                 .font(.system(size: 38, weight: .bold, design: .rounded))
@@ -27,32 +22,52 @@ struct WelcomeView: View {
                 .foregroundStyle(.secondary)
                 .padding(.top, 2)
 
-            VStack(spacing: 12) {
-                WelcomeAction(
-                    symbol: "arrow.up.doc",
-                    title: "Backup Device",
-                    detail: "Download device data and archive to selected destination"
-                ) {
-                    vm.mode = .backup
-                    vm.page = .findDevice
-                }
+            Link("@Sunbelife · weibo.com/x1nyang", destination: URL(string: "https://weibo.com/x1nyang")!)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.top, 8)
 
-                WelcomeAction(
-                    symbol: "arrow.down.doc",
-                    title: "Restore Device",
-                    detail: "Restore device data from selected archive"
-                ) {
-                    vm.mode = .restore
-                    vm.page = .findDevice
-                }
-            }
-            .padding(.top, 25)
-            .frame(maxWidth: 440)
+            actions
+                .padding(.top, 25)
+                .frame(maxWidth: 440)
 
             Spacer(minLength: 12)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear { vm.resetAll() }
+    }
+
+    @ViewBuilder
+    private var actions: some View {
+        if #available(macOS 26.0, *) {
+            GlassEffectContainer(spacing: 12) {
+                actionButtons
+            }
+        } else {
+            actionButtons
+        }
+    }
+
+    private var actionButtons: some View {
+        VStack(spacing: 12) {
+            WelcomeAction(
+                symbol: "arrow.up.doc",
+                title: "Backup Device",
+                detail: "Download device data and archive to selected destination"
+            ) {
+                vm.mode = .backup
+                vm.page = .findDevice
+            }
+
+            WelcomeAction(
+                symbol: "arrow.down.doc",
+                title: "Restore Device",
+                detail: "Restore device data from selected archive"
+            ) {
+                vm.mode = .restore
+                vm.page = .findDevice
+            }
+        }
     }
 }
 
@@ -87,12 +102,7 @@ private struct WelcomeAction: View {
             }
             .foregroundStyle(.primary)
             .padding(15)
-            .background(.background)
-            .clipShape(.rect(cornerRadius: 20))
-            .overlay {
-                RoundedRectangle(cornerRadius: 20)
-                    .strokeBorder(.primary.opacity(0.08), lineWidth: 1)
-            }
+            .itmGlassSurface(cornerRadius: 20, interactive: true)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)

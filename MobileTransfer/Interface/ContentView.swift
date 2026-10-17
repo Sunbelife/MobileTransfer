@@ -31,8 +31,11 @@ struct ContentView: View {
                     )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            Divider().padding(.horizontal, -32)
-            FootnoteView().padding(.top, 16)
+            FootnoteView()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .itmGlassSurface(cornerRadius: 18)
+                .padding(.top, 16)
         }
         .animation(animation, value: vm.page)
         .onChange(of: vm.page) {

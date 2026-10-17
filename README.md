@@ -2,6 +2,8 @@
 
 iTM (iOS TimeMachine) is a macOS app for backing up and restoring iOS devices. It is based on [MobileTransfer](https://github.com/Lakr233/MobileTransfer) by Lakr Aream.
 
+Author: [@Sunbelife](https://weibo.com/x1nyang) · Sina Weibo.
+
 ## Features
 
 - Back up and restore iOS device data.

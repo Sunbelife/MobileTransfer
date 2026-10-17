@@ -1,5 +1,7 @@
 # iTM
 
+作者：@Sunbelife · 新浪微博：[https://weibo.com/x1nyang](https://weibo.com/x1nyang)
+
 iTM（iOS TimeMachine）是一款用于备份和恢复 iOS 设备的 macOS 应用，基于 Lakr Aream 的 [MobileTransfer](https://github.com/Lakr233/MobileTransfer) 开发。
 
 ## 功能

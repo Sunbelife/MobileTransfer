@@ -487,7 +487,7 @@
 				INFOPLIST_FILE = MobileTransfer/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = iTM;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 Lakr Aream. iTM modifications © 2026 nooTag Tech.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Sunbelife. MobileTransfer © 2025 Lakr Aream.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -530,7 +530,7 @@
 				INFOPLIST_FILE = MobileTransfer/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = iTM;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 Lakr Aream. iTM modifications © 2026 nooTag Tech.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Sunbelife. MobileTransfer © 2025 Lakr Aream.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
