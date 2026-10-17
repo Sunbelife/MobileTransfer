@@ -6,10 +6,205 @@
 //
 
 import Cocoa
+import Darwin
 import Foundation
 import UniformTypeIdentifiers
 
 enum Archives {
+    static let incrementalMarkerName = ".itm-incremental-base.plist"
+    static let pendingMarkerName = ".itm-pending"
+    private static let historyKey = "tech.nootag.itm.backupHistoryPaths"
+
+    struct BackupRecord: Identifiable {
+        let url: URL
+        let date: Date
+        let deviceIdentifier: String
+
+        var id: String { url.path }
+    }
+
+    static func rememberCompletedBackup(at url: URL) {
+        guard backupRecord(at: url) != nil else { return }
+        trackBackup(at: url)
+    }
+
+    static func trackBackup(at url: URL) {
+        var paths = UserDefaults.standard.stringArray(forKey: historyKey) ?? []
+        let path = url.standardizedFileURL.path
+        if !paths.contains(path) {
+            paths.append(path)
+            UserDefaults.standard.set(paths, forKey: historyKey)
+        }
+    }
+
+    static func availableBackups(for deviceIdentifier: String? = nil) -> [BackupRecord] {
+        let paths = Set(UserDefaults.standard.stringArray(forKey: historyKey) ?? [])
+        return paths.compactMap { backupRecord(at: URL(fileURLWithPath: $0)) }
+            .filter {
+                guard let deviceIdentifier else { return true }
+                return $0.deviceIdentifier.caseInsensitiveCompare(deviceIdentifier) == .orderedSame
+            }
+            .sorted { $0.date > $1.date }
+    }
+
+    private static func backupRecord(at url: URL) -> BackupRecord? {
+        guard url.pathExtension.lowercased() == "mobiletransfer",
+              !FileManager.default.fileExists(atPath: url.appendingPathComponent(pendingMarkerName).path),
+              let info = NSDictionary(contentsOf: url.appendingPathComponent("Info.plist")) as? [String: Any],
+              let identifier = (info["Target Identifier"] as? String) ?? (info["Unique Identifier"] as? String),
+              let status = NSDictionary(contentsOf: url.appendingPathComponent("Status.plist")) as? [String: Any],
+              (status["SnapshotState"] as? String)?.lowercased() == "finished"
+        else { return nil }
+        let date = (status["Date"] as? Date)
+            ?? (try? url.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
+            ?? .distantPast
+        return BackupRecord(url: url, date: date, deviceIdentifier: identifier)
+    }
+
+    enum BackupSourceMode {
+        case incremental
+        case resumeIncremental
+        case retryFull
+    }
+
+    struct BackupSource {
+        let url: URL
+        let mode: BackupSourceMode
+    }
+
+    enum BackupSourceError: LocalizedError {
+        case invalid
+        case wrongDevice
+        case unsupportedVolume
+        case inUse
+
+        var errorDescription: String? {
+            switch self {
+            case .invalid: return NSLocalizedString("This backup cannot be continued.", comment: "")
+            case .wrongDevice: return NSLocalizedString("This backup belongs to another device.", comment: "")
+            case .unsupportedVolume: return NSLocalizedString("Version history requires an APFS volume.", comment: "")
+            case .inUse: return NSLocalizedString("This backup is already in use.", comment: "")
+            }
+        }
+    }
+
+    static func inspectBackupSource(at url: URL, deviceIdentifier: String) throws -> BackupSource {
+        guard let info = NSDictionary(contentsOf: url.appendingPathComponent("Info.plist")) as? [String: Any],
+              let identifier = (info["Target Identifier"] as? String) ?? (info["Unique Identifier"] as? String),
+              let status = NSDictionary(contentsOf: url.appendingPathComponent("Status.plist")) as? [String: Any],
+              let state = status["SnapshotState"] as? String
+        else { throw BackupSourceError.invalid }
+        guard identifier.caseInsensitiveCompare(deviceIdentifier) == .orderedSame else {
+            throw BackupSourceError.wrongDevice
+        }
+        let lockPath = url.appendingPathComponent(".itm.lock").path
+        if FileManager.default.fileExists(atPath: lockPath) {
+            let descriptor = open(lockPath, O_RDONLY | O_NOFOLLOW)
+            guard descriptor >= 0 else { throw BackupSourceError.invalid }
+            defer { close(descriptor) }
+            guard flock(descriptor, LOCK_EX | LOCK_NB) == 0 else {
+                throw BackupSourceError.inUse
+            }
+            flock(descriptor, LOCK_UN)
+        }
+
+        let hasManifest = ["Manifest.plist", "Manifest.db"].allSatisfy { name in
+            let path = url.appendingPathComponent(name).path
+            let size = (try? FileManager.default.attributesOfItem(atPath: path)[.size]) as? NSNumber
+            return (size?.int64Value ?? 0) > 0
+        }
+        switch state.lowercased() {
+        case "finished" where hasManifest && hasIncrementalMarker(at: url)
+            && FileManager.default.fileExists(atPath: url.appendingPathComponent(pendingMarkerName).path):
+            return BackupSource(url: url, mode: .resumeIncremental)
+        case "finished" where hasManifest
+            && !FileManager.default.fileExists(atPath: url.appendingPathComponent(pendingMarkerName).path):
+            guard validateRestoreArchive(at: url).verified else {
+                throw BackupSourceError.invalid
+            }
+            return BackupSource(url: url, mode: .incremental)
+        case "uploading" where hasManifest && hasIncrementalMarker(at: url):
+            return BackupSource(url: url, mode: .resumeIncremental)
+        case "uploading":
+            return BackupSource(url: url, mode: .retryFull)
+        default:
+            throw BackupSourceError.invalid
+        }
+    }
+
+    static func makeIncrementalVersion(from source: URL, deviceName: String) throws -> URL {
+        let lockPath = source.appendingPathComponent(".itm.lock").path
+        let archiveLock = open(lockPath, O_CREAT | O_RDWR | O_NOFOLLOW, 0o600)
+        guard archiveLock >= 0 else { throw BackupSourceError.invalid }
+        defer { close(archiveLock) }
+        guard flock(archiveLock, LOCK_EX | LOCK_NB) == 0 else {
+            throw BackupSourceError.inUse
+        }
+
+        let name = deviceName.replacingOccurrences(of: "/", with: "-")
+            .replacingOccurrences(of: ":", with: "-")
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd-HHmmss"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        let stamp = formatter.string(from: Date())
+        let parent = source.deletingLastPathComponent()
+        var destination = parent.appendingPathComponent("\(name)-\(stamp).mobiletransfer")
+        var index = 2
+        while FileManager.default.fileExists(atPath: destination.path) {
+            destination = parent.appendingPathComponent("\(name)-\(stamp)-\(index).mobiletransfer")
+            index += 1
+        }
+
+        try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: false)
+        do {
+            try Data().write(to: destination.appendingPathComponent(pendingMarkerName))
+            try cloneBackupContents(from: source, to: destination)
+            let marker = ["BaseArchive": source.lastPathComponent]
+            let markerData = try PropertyListSerialization.data(
+                fromPropertyList: marker, format: .xml, options: 0
+            )
+            try markerData.write(
+                to: destination.appendingPathComponent(incrementalMarkerName),
+                options: .atomic
+            )
+            return destination
+        } catch {
+            try? FileManager.default.removeItem(at: destination)
+            throw error
+        }
+    }
+
+    static func hasIncrementalMarker(at url: URL) -> Bool {
+        let marker = url.appendingPathComponent(incrementalMarkerName)
+        guard let info = NSDictionary(contentsOf: marker) as? [String: Any],
+              let base = info["BaseArchive"] as? String else { return false }
+        return !base.isEmpty
+    }
+
+    private static func cloneBackupContents(from source: URL, to destination: URL) throws {
+        for item in try FileManager.default.contentsOfDirectory(
+            at: source,
+            includingPropertiesForKeys: [.isDirectoryKey, .isRegularFileKey, .isSymbolicLinkKey]
+        ) {
+            let target = destination.appendingPathComponent(item.lastPathComponent)
+            let values = try item.resourceValues(forKeys: [.isDirectoryKey, .isRegularFileKey, .isSymbolicLinkKey])
+            if values.isSymbolicLink == true { throw BackupSourceError.invalid }
+            if values.isDirectory == true {
+                try FileManager.default.createDirectory(at: target, withIntermediateDirectories: false)
+                try cloneBackupContents(from: item, to: target)
+            } else if values.isRegularFile == true {
+                guard clonefile(item.path, target.path, 0) == 0 else {
+                    if errno == ENOTSUP || errno == EXDEV {
+                        throw BackupSourceError.unsupportedVolume
+                    }
+                    throw NSError(domain: NSPOSIXErrorDomain, code: Int(errno))
+                }
+            } else {
+                throw BackupSourceError.invalid
+            }
+        }
+    }
+
     struct ArchiveInfo {
         let url: URL
         let verified: Bool
@@ -244,6 +439,11 @@ extension Archives {
         }
         guard let manifest = NSDictionary(contentsOf: manifestPlist) as? [String: Any] else {
             return .broken(at: url, reason: NSLocalizedString("Manifest.plist not readable", comment: ""))
+        }
+        let manifestDatabase = url.appendingPathComponent("Manifest.db")
+        let databaseSize = (try? FileManager.default.attributesOfItem(atPath: manifestDatabase.path)[.size]) as? NSNumber
+        guard (databaseSize?.int64Value ?? 0) > 0 else {
+            return .broken(at: url, reason: NSLocalizedString("Manifest.db not found", comment: ""))
         }
         let restoreArchiveIsPasswordProtected = manifest["IsEncrypted"] as? Bool ?? false
 

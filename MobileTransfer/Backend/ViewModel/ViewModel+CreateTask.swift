@@ -26,6 +26,7 @@ extension ViewModel {
             backupAppList: backupApplicationList
         )
         let task = BackupTask(parameter: parameter)
+        Archives.trackBackup(at: parameter.backupLocation)
         backupTask = task
 
         bindProgressToDock()
@@ -120,9 +121,12 @@ extension ViewModel {
                 return
             }
             do {
+                guard !FileManager.default.fileExists(atPath: newUrl.path) else {
+                    throw CocoaError(.fileWriteFileExists)
+                }
                 try FileManager.default.createDirectory(
                     at: newUrl,
-                    withIntermediateDirectories: true
+                    withIntermediateDirectories: false
                 )
                 self.backupLocation = newUrl.path
                 completion?(true)
@@ -152,7 +156,8 @@ extension ViewModel {
 
         panel.beginSheetModal(for: window) { response in
             guard response == .OK, let url = panel.url else { return }
-            guard self.validateRestoreArchive(at: url) else {
+            let info = Archives.validateRestoreArchive(at: url)
+            guard info.verified else {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     let alert = NSAlert()
                     alert.messageText = NSLocalizedString("Invalid Archive", comment: "")
@@ -163,7 +168,11 @@ extension ViewModel {
                 }
                 return
             }
+            self.restoreArchiveIsPasswordProtected = info.isEncrypted
+            self.restoreApplicationsCount = info.applications
+            self.restoreArchiveSystemBuildVersion = info.systemBuildVersion
             self.restoreLocation = url.path
+            Archives.rememberCompletedBackup(at: url)
         }
     }
 

@@ -20,10 +20,16 @@ struct BackupDeviceDataTaskView: View {
         "\(Int(task.overall.fractionCompleted * 100))%"
     }
 
+    private var hasCurrentProgress: Bool {
+        task.hasStartedTransfer && task.current.totalUnitCount > 0
+    }
+
+    private var currentPercent: String {
+        "\(Int(task.current.fractionCompleted * 100))%"
+    }
+
     private var currentTransfer: String? {
-        guard task.hasStartedTransfer,
-              task.current.totalUnitCount > 0
-        else { return nil }
+        guard hasCurrentProgress else { return nil }
 
         let formatter = ByteCountFormatter()
         formatter.countStyle = .file
@@ -45,8 +51,11 @@ struct BackupDeviceDataTaskView: View {
                         .foregroundStyle(task.success ? .green : .red)
                         .accessibilityHidden(true)
                 } else if hasOverallProgress {
-                    Text(overallPercent)
-                        .monospacedDigit()
+                    HStack(spacing: 4) {
+                        Text("Overall")
+                        Text(overallPercent)
+                            .monospacedDigit()
+                    }
                 }
                 Button {
                     showingDetails = true
@@ -63,14 +72,26 @@ struct BackupDeviceDataTaskView: View {
             }
 
             VStack(alignment: .leading, spacing: 18) {
-                status
-                    .font(.title2.weight(.semibold))
+                HStack(alignment: .firstTextBaseline) {
+                    status
+                        .font(.title2.weight(.semibold))
+                    Spacer()
+                    if !task.completed, hasCurrentProgress {
+                        Text("Current batch \(currentPercent)")
+                            .font(.headline.monospacedDigit())
+                    }
+                }
 
                 Group {
-                    if task.completed || hasOverallProgress {
+                    if task.completed {
                         ProgressView(
                             value: Double(task.overall.completedUnitCount),
                             total: Double(max(task.overall.totalUnitCount, 1))
+                        )
+                    } else if hasCurrentProgress {
+                        ProgressView(
+                            value: Double(task.current.completedUnitCount),
+                            total: Double(max(task.current.totalUnitCount, 1))
                         )
                     } else {
                         ProgressView()
@@ -102,7 +123,11 @@ struct BackupDeviceDataTaskView: View {
                     .foregroundStyle(.red)
             }
         } else if task.hasStartedTransfer {
-            Text("Transferring device data…")
+            if let sourceName = task.currentSourceName {
+                Text("Backing up \(sourceName)…")
+            } else {
+                Text("Transferring device data…")
+            }
         } else {
             Text("Preparing data on iPhone…")
         }
@@ -117,11 +142,8 @@ struct BackupDeviceDataTaskView: View {
                 Text("Open details to see what happened.")
             }
         } else if let currentTransfer {
-            HStack(spacing: 6) {
-                Text("Current batch")
-                Text(currentTransfer)
-                    .monospacedDigit()
-            }
+            Text(currentTransfer)
+                .monospacedDigit()
         } else {
             Text("The first backup may take a few minutes to prepare. Confirm any prompt on your iPhone.")
         }

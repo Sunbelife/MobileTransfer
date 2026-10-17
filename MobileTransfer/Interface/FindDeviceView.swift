@@ -206,12 +206,7 @@ struct FindDeviceView: View {
                 .path
             vm.page = .prepareBackup
         case .restore:
-            if vm.restoreLocation == nil {
-                vm.pickRestoreArchive()
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                vm.page = .prepareRestore
-            }
+            vm.page = .prepareRestore
         }
     }
 }

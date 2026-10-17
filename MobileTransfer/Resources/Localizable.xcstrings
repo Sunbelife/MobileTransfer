@@ -36,6 +36,16 @@
         }
       }
     },
+    "A new incremental version will be created. The selected backup stays unchanged." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "将创建新的增量备份版本，所选备份保持不变。"
+          }
+        }
+      }
+    },
     "Abort" : {
       "localizations" : {
         "zh-Hans" : {
@@ -112,6 +122,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "设备上的数据将被抹掉，备份中的数据将被恢复。"
+          }
+        }
+      }
+    },
+    "App data" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "应用数据"
           }
         }
       }
@@ -216,6 +236,16 @@
         }
       }
     },
+    "Backing up %@…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在备份 %@…"
+          }
+        }
+      }
+    },
     "Backup" : {
       "localizations" : {
         "zh-Hans" : {
@@ -302,6 +332,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "备份未完成，当前文件不能用于恢复。"
+          }
+        }
+      }
+    },
+    "Backup History" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "备份历史"
           }
         }
       }
@@ -466,12 +506,42 @@
         }
       }
     },
+    "Choose an Existing Backup" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择现有备份"
+          }
+        }
+      }
+    },
+    "Choose Another Backup…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择其他备份…"
+          }
+        }
+      }
+    },
     "Choose Backup Archive to Restore" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "选择一个备份归档来恢复"
+          }
+        }
+      }
+    },
+    "Choose Backup from File…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从文件中选择备份…"
           }
         }
       }
@@ -562,6 +632,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "仍然继续（修改备份）"
+          }
+        }
+      }
+    },
+    "Continue or Update an Existing Backup…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "继续或更新现有备份…"
           }
         }
       }
@@ -662,6 +742,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "当前批次"
+          }
+        }
+      }
+    },
+    "Current batch %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前批次 %@"
           }
         }
       }
@@ -983,6 +1073,16 @@
         }
       }
     },
+    "Finding backups…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在查找备份…"
+          }
+        }
+      }
+    },
     "Forgot password?" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1179,6 +1279,26 @@
         }
       }
     },
+    "Latest backup" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最新备份"
+          }
+        }
+      }
+    },
+    "Latest backup: %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最新备份：%@"
+          }
+        }
+      }
+    },
     "Learn More (Enable Encrypted Backup)" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1229,6 +1349,16 @@
         }
       }
     },
+    "Manifest.db not found" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未找到 Manifest.db"
+          }
+        }
+      }
+    },
     "Manifest.plist not found" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1245,6 +1375,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无法读取 Manifest.plist 文件"
+          }
+        }
+      }
+    },
+    "Media" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "媒体"
           }
         }
       }
@@ -1392,6 +1532,26 @@
         }
       }
     },
+    "No completed backup found" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未找到已完成的备份"
+          }
+        }
+      }
+    },
+    "No completed backup found for this device." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未找到此设备已完成的备份。"
+          }
+        }
+      }
+    },
     "Not Selected" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1442,6 +1602,16 @@
         }
       }
     },
+    "Overall" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "总进度"
+          }
+        }
+      }
+    },
     "Password" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1458,6 +1628,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "两次输入的密码不一致。"
+          }
+        }
+      }
+    },
+    "Photos" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "照片"
           }
         }
       }
@@ -1582,6 +1762,16 @@
         }
       }
     },
+    "Preparing Backup…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在准备备份…"
+          }
+        }
+      }
+    },
     "Preparing data on iPhone…" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1692,6 +1882,26 @@
         }
       }
     },
+    "Resume Incremental Backup" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "继续增量备份"
+          }
+        }
+      }
+    },
+    "Retry Backup" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重试备份"
+          }
+        }
+      }
+    },
     "Revoke" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1752,6 +1962,16 @@
         }
       }
     },
+    "Selected backup" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已选备份"
+          }
+        }
+      }
+    },
     "Selected file is not a directory" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1768,6 +1988,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "设置备份密码"
+          }
+        }
+      }
+    },
+    "Shared app data" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "应用共享数据"
           }
         }
       }
@@ -1852,12 +2082,32 @@
         }
       }
     },
+    "Start a New Backup" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始新备份"
+          }
+        }
+      }
+    },
     "Start Backup" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "开始备份"
+          }
+        }
+      }
+    },
+    "Start Incremental Backup" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始增量备份"
           }
         }
       }
@@ -1964,6 +2214,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "完成 %1$lld 失败 %2$lld 总计 %3$lld"
+          }
+        }
+      }
+    },
+    "System data" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统数据"
           }
         }
       }
@@ -2144,6 +2404,16 @@
         }
       }
     },
+    "The unfinished incremental version will continue from its previous complete snapshot." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未完成的增量备份版本将从上一个完整快照继续。"
+          }
+        }
+      }
+    },
     "There are two types of restore modes, **Merge Restore** and **Replace Restore**." : {
       "localizations" : {
         "zh-Hans" : {
@@ -2164,6 +2434,26 @@
         }
       }
     },
+    "This backup belongs to another device." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此备份属于另一台设备。"
+          }
+        }
+      }
+    },
+    "This backup cannot be continued." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法继续此备份。"
+          }
+        }
+      }
+    },
     "This backup does not include any apps, we suggest you to choose **Replace Restore**." : {
       "localizations" : {
         "zh-Hans" : {
@@ -2174,12 +2464,32 @@
         }
       }
     },
+    "This backup has no verified incremental checkpoint. Retrying may transfer all device data again." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此备份没有经过验证的增量检查点。重试可能需要重新传输设备的全部数据。"
+          }
+        }
+      }
+    },
     "This backup includes %lld apps, which can not be installed if using Replace Restore." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "此备份包含 %lld 个软件安装包。这些软件不能在使用替换恢复时安装。"
+          }
+        }
+      }
+    },
+    "This backup is already in use." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这份备份正在使用中。"
           }
         }
       }
@@ -2504,6 +2814,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "验证下载内容…"
+          }
+        }
+      }
+    },
+    "Version history requires an APFS volume." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "版本历史需要 APFS 卷。"
           }
         }
       }

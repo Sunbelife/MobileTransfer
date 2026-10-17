@@ -2,6 +2,16 @@ import SwiftUI
 
 struct WelcomeView: View {
     @Environment(ViewModel.self) private var vm
+    @State private var latestBackupDate: Date?
+    @State private var loadingHistory = true
+
+    private var restoreDetail: LocalizedStringKey {
+        if loadingHistory { return "Finding backups…" }
+        if let latestBackupDate {
+            return "Latest backup: \(latestBackupDate.formatted(date: .abbreviated, time: .shortened))"
+        }
+        return "No completed backup found"
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,7 +44,17 @@ struct WelcomeView: View {
             Spacer(minLength: 12)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onAppear { vm.resetAll() }
+        .onAppear {
+            vm.resetAll()
+            loadingHistory = true
+            DispatchQueue.global(qos: .utility).async {
+                let latest = Archives.availableBackups().first?.date
+                DispatchQueue.main.async {
+                    latestBackupDate = latest
+                    loadingHistory = false
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -62,7 +82,7 @@ struct WelcomeView: View {
             WelcomeAction(
                 symbol: "arrow.down.doc",
                 title: "Restore Device",
-                detail: "Restore device data from selected archive"
+                detail: restoreDetail
             ) {
                 vm.mode = .restore
                 vm.page = .findDevice

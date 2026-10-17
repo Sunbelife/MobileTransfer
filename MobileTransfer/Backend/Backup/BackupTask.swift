@@ -92,6 +92,12 @@ class BackupTask: Identifiable {
 
         let backupLocation = parameter.backupLocation
         let info = Archives.validateRestoreArchive(at: backupLocation)
+        if info.verified {
+            try? FileManager.default.removeItem(
+                at: backupLocation.appendingPathComponent(Archives.pendingMarkerName)
+            )
+            Archives.rememberCompletedBackup(at: backupLocation)
+        }
         DispatchQueue.main.asyncAndWait {
             self.verificationStatus = info.verified ? .passed : .failed
         }

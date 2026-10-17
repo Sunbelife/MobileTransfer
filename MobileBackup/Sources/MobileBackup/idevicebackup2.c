@@ -1024,6 +1024,7 @@ static int mb2_handle_receive_files(mobilebackup2_client_t mobilebackup2, plist_
 	char buf[32768];
 	char *fname = NULL;
 	char *dname = NULL;
+	char *last_domain = NULL;
 	char *bname = NULL;
 	char code = 0;
 	char last_code = 0;
@@ -1034,6 +1035,8 @@ static int mb2_handle_receive_files(mobilebackup2_client_t mobilebackup2, plist_
 	char *errdesc = NULL;
 
 	if (!message || (plist_get_node_type(message) != PLIST_ARRAY) || plist_array_get_size(message) < 4 || !backup_dir) return 0;
+	printf("ITM_BATCH_START\n");
+	fflush(stdout);
 
 	node = plist_array_get_item(message, 3);
 	if (plist_get_node_type(node) == PLIST_UINT) {
@@ -1047,9 +1050,41 @@ static int mb2_handle_receive_files(mobilebackup2_client_t mobilebackup2, plist_
 		if (quit_flag)
 			break;
 
+		free(dname);
+		dname = NULL;
 		nlen = mb2_receive_filename(mobilebackup2, &dname);
 		if (nlen == 0) {
 			break;
+		}
+		if (dname) {
+			const char *source = dname;
+			if (dname[0] == '/') {
+				if (strstr(dname, "/Media/DCIM/") || strstr(dname, "/Media/PhotoData/")) {
+					source = "CameraRollDomain";
+				} else if (strstr(dname, "/Containers/Data/Application/") ||
+				           strstr(dname, "/Containers/Shared/AppGroup/")) {
+					source = "AppDataDomain";
+				} else if (strstr(dname, "/Media/")) {
+					source = "MediaDomain";
+				} else {
+					source = "SystemDomain";
+				}
+			}
+			const char *end = strchr(source, '/');
+			size_t domain_len = end ? (size_t)(end - source) : strlen(source);
+			if (domain_len > 0 && domain_len <= 200 &&
+			    (!last_domain || strlen(last_domain) != domain_len || strncmp(last_domain, source, domain_len))) {
+				free(last_domain);
+				last_domain = strndup(source, domain_len);
+				if (last_domain) {
+					printf("ITM_DOMAIN_HEX:");
+					for (size_t i = 0; i < domain_len; i++) {
+						printf("%02x", (unsigned char)last_domain[i]);
+					}
+					printf("\n");
+					fflush(stdout);
+				}
+			}
 		}
 
 		nlen = mb2_receive_filename(mobilebackup2, &fname);
@@ -1174,10 +1209,13 @@ static int mb2_handle_receive_files(mobilebackup2_client_t mobilebackup2, plist_
 
 	if (dname != NULL)
 		free(dname);
+	free(last_domain);
 
 	plist_t empty_plist = plist_new_dict();
 	mobilebackup2_send_status_response(mobilebackup2, errcode, errdesc, empty_plist);
 	plist_free(empty_plist);
+	printf("ITM_BATCH_END\n");
+	fflush(stdout);
 
 	return file_count;
 }
