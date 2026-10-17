@@ -22,13 +22,55 @@ private struct UnregisteredDevice: Codable, Identifiable, Hashable, Equatable {
         deviceRecord?.valueFor("TrustedHostAttached") ?? false
     }
 
-    var deviceName: String {
-        deviceRecord?.deviceName ?? "Unknown"
+    var deviceName: String? {
+        guard let name = deviceRecord?.deviceName?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !name.isEmpty
+        else { return nil }
+        return name
     }
 
-    var productType: String {
-        deviceRecord?.productType ?? "Unknown"
+    var modelName: String? {
+        if let productType = deviceRecord?.productType,
+           let modelName = Self.modelNames[productType]
+        {
+            return modelName
+        }
+        return deviceRecord?.deviceClass
     }
+
+    private static let modelNames: [String: String] = [
+        "iPhone12,1": "iPhone 11",
+        "iPhone12,3": "iPhone 11 Pro",
+        "iPhone12,5": "iPhone 11 Pro Max",
+        "iPhone12,8": "iPhone SE (2nd generation)",
+        "iPhone13,1": "iPhone 12 mini",
+        "iPhone13,2": "iPhone 12",
+        "iPhone13,3": "iPhone 12 Pro",
+        "iPhone13,4": "iPhone 12 Pro Max",
+        "iPhone14,2": "iPhone 13 Pro",
+        "iPhone14,3": "iPhone 13 Pro Max",
+        "iPhone14,4": "iPhone 13 mini",
+        "iPhone14,5": "iPhone 13",
+        "iPhone14,6": "iPhone SE (3rd generation)",
+        "iPhone14,7": "iPhone 14",
+        "iPhone14,8": "iPhone 14 Plus",
+        "iPhone15,2": "iPhone 14 Pro",
+        "iPhone15,3": "iPhone 14 Pro Max",
+        "iPhone15,4": "iPhone 15",
+        "iPhone15,5": "iPhone 15 Plus",
+        "iPhone16,1": "iPhone 15 Pro",
+        "iPhone16,2": "iPhone 15 Pro Max",
+        "iPhone17,1": "iPhone 16 Pro",
+        "iPhone17,2": "iPhone 16 Pro Max",
+        "iPhone17,3": "iPhone 16",
+        "iPhone17,4": "iPhone 16 Plus",
+        "iPhone17,5": "iPhone 16e",
+        "iPhone18,1": "iPhone 17 Pro",
+        "iPhone18,2": "iPhone 17 Pro Max",
+        "iPhone18,3": "iPhone 17",
+        "iPhone18,4": "iPhone Air",
+        "iPhone18,5": "iPhone 17e",
+    ]
 
     var deviceSystemIcon: String {
         deviceRecord?.deviceClass?.lowercased() ?? "questionmark.circle"
@@ -47,7 +89,9 @@ struct FindDeviceView: View {
     @State private var openTrustPage: Bool = false
 
     var title: LocalizedStringKey {
-        if isScanning {
+        if !deviceList.isEmpty {
+            "Devices found"
+        } else if isScanning {
             "Scanning for devices..."
         } else {
             "Please connect your device to this computer via a cable"
@@ -179,17 +223,29 @@ private struct UnregisteredDeviceView: View {
         Button {
             action()
         } label: {
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
+                Image(systemName: device.deviceSystemIcon)
+                    .font(.title2)
+                    .frame(width: 28)
                 VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Image(systemName: device.deviceSystemIcon)
-                        Text(device.productType)
+                    if let name = device.deviceName {
+                        Text(name)
+                            .font(.system(.headline, design: .rounded))
                             .lineLimit(1)
+                    } else {
+                        Text("Unnamed Device")
+                            .font(.system(.headline, design: .rounded))
                     }
-                    .font(.system(.headline, design: .rounded))
-                    Text(device.trusted ? device.deviceName : device.udid)
-                        .font(.footnote)
-                        .lineLimit(1)
+                    if let modelName = device.modelName {
+                        Text(modelName)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    } else {
+                        Text("Unknown Model")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "arrow.right")
