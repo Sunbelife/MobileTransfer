@@ -16,7 +16,7 @@ class ViewModel {
     static let shared = ViewModel()
 
     static let defaultBackupLocation = URL(fileURLWithPath: NSTemporaryDirectory())
-        .appendingPathComponent("MobileTransfer")
+        .appendingPathComponent("iTM")
 
     enum Page: String {
         case welcome
@@ -60,7 +60,7 @@ class ViewModel {
 
     // disabled by default due to recent api changes on Apple's server side
     @ObservationIgnored
-    private var _showAppPackageDownloadPanel = StoredValue(key: "wiki.qaq.showAppPackageDownloadPanel", defaultValue: false)
+    private var _showAppPackageDownloadPanel = StoredValue(key: "tech.nootag.itm.showAppPackageDownloadPanel", defaultValue: false)
     var showAppPackageDownloadPanel: Bool {
         get {
             access(keyPath: \.showAppPackageDownloadPanel)

@@ -17,8 +17,12 @@ struct CardContentView<V: View>: View {
         }
         .frame(maxWidth: .infinity)
         .padding(16)
-        .background(.background.opacity(0.5))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .background(.background)
+        .clipShape(.rect(cornerRadius: 18))
+        .overlay {
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(.primary.opacity(0.08), lineWidth: 1)
+        }
     }
 }
 

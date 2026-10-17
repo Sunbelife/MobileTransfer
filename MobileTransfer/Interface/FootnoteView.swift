@@ -10,21 +10,10 @@ import SwiftUI
 struct FootnoteView: View {
     @Environment(ViewModel.self) var vm
 
-    @State var openAgreementSheet = false
-    @AppStorage("AgreementsShown") var agreementsShown = false
-
-    var showAgreements: Bool {
-        vm.mode == .unspecified
-    }
-
     var footnote: LocalizedStringKey {
-        if showAgreements {
-            return "By using this app you agree to our Terms of Service and Privacy Policy"
-        }
         switch vm.mode {
         case .unspecified:
-            assertionFailure()
-            return ""
+            return "iOS TimeMachine"
         case .backup:
             if let did = vm.deviceIdentifier {
                 return "Backup Mode \(did)"
@@ -74,17 +63,15 @@ struct FootnoteView: View {
             } else {
                 Text(footnote)
                     .lineLimit(1)
-                    .underline(showAgreements)
                     .frame(maxWidth: .infinity)
                     .multilineTextAlignment(.center)
                     .contentTransition(.numericText())
-                    .onTapGesture { if showAgreements { openAgreementSheet = true } }
             }
             Text(version)
                 .lineLimit(1)
                 .multilineTextAlignment(.trailing)
                 .contentTransition(.numericText())
-                .opacity(vm.page == .actionMenu ? 1 : 0)
+                .opacity(vm.page == .welcome || vm.page == .actionMenu ? 1 : 0)
                 .frame(width: 100, alignment: .trailing)
         }
         .animation(.spring, value: vm.page)
@@ -98,13 +85,6 @@ struct FootnoteView: View {
                 }
             }
         }
-        .sheet(isPresented: $openAgreementSheet) {
-            AgreementSheetView()
-        }
-        .onAppear { if !agreementsShown {
-            openAgreementSheet = true
-            agreementsShown = true
-        } }
     }
 }
 

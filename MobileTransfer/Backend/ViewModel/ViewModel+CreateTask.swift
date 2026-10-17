@@ -132,7 +132,7 @@ extension ViewModel {
         panel.canCreateDirectories = false
         panel.message = NSLocalizedString("Choose Backup Archive to Restore", comment: "")
 
-        if let type = UTType("wiki.qaq.mobiletransfer.package") {
+        if let type = UTType("tech.nootag.itm.backup") {
             panel.allowedContentTypes = [type]
         } else {
             assertionFailure()

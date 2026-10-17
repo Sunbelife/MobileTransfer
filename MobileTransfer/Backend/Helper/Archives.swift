@@ -60,7 +60,7 @@ extension Archives {
         panel.allowsOtherFileTypes = false
         panel.canCreateDirectories = true
 
-        if let type = UTType("wiki.qaq.mobiletransfer.package") {
+        if let type = UTType("tech.nootag.itm.backup") {
             panel.allowedContentTypes = [type]
         } else {
             assertionFailure()
@@ -133,7 +133,7 @@ extension Archives {
         let alert = NSAlert()
         alert.messageText = NSLocalizedString("Convert BBackupp Archive", comment: "")
         alert.informativeText = String(format:
-            NSLocalizedString("Convert BBackupp archive for %@ to MobileTransfer format?", comment: ""),
+            NSLocalizedString("Convert BBackupp archive for %@ to iTM format?", comment: ""),
             device.deviceName)
         alert.addButton(withTitle: NSLocalizedString("Convert In Place", comment: ""))
         alert.buttons.first?.hasDestructiveAction = true
@@ -340,7 +340,7 @@ extension Archives {
         panel.allowsOtherFileTypes = false
         panel.canCreateDirectories = true
 
-        if let type = UTType("wiki.qaq.mobiletransfer.package") {
+        if let type = UTType("tech.nootag.itm.backup") {
             panel.allowedContentTypes = [type]
         } else {
             assertionFailure()

@@ -526,12 +526,12 @@
         }
       }
     },
-    "Convert BBackupp archive for %@ to MobileTransfer format?" : {
+    "Convert BBackupp archive for %@ to iTM format?" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "转换来自设备 %@ 的 BBackupp 归档到迁移文件？"
+            "value" : "转换来自设备 %@ 的 BBackupp 归档到 iTM 格式？"
           }
         }
       }
@@ -1858,12 +1858,12 @@
         }
       }
     },
-    "The MobileTransfer installed on this computer is licensed to:" : {
+    "The iTM installed on this computer is licensed to:" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "此计算机安装的 迁移 授权给："
+            "value" : "此计算机安装的 iTM 授权给："
           }
         }
       }
@@ -2004,12 +2004,12 @@
         }
       }
     },
-    "This is a trial version of MobileTransfer. Please activate the app to use all features." : {
+    "This is a trial version of iTM. Please activate the app to use all features." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "你正在试用迁移。请使用授权码激活软件以利用全部功能。"
+            "value" : "你正在试用 iTM。请使用授权码激活软件以利用全部功能。"
           }
         }
       }

@@ -22,10 +22,9 @@
 		50A4C96A2CC1089000954D3E /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 50A4C9692CC1089000954D3E /* ConfettiSwiftUI */; };
 		50A7D5BE2CA42D3500A9CBFB /* Digger in Frameworks */ = {isa = PBXBuildFile; productRef = 50A7D5BD2CA42D3500A9CBFB /* Digger */; };
 		50A7D5C52CA4398B00A9CBFB /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 50A7D5C42CA4398B00A9CBFB /* Kingfisher */; };
-		50A7D5C92CA5055400A9CBFB /* MobileTransfer.icns in Resources */ = {isa = PBXBuildFile; fileRef = 50A7D5C82CA5055400A9CBFB /* MobileTransfer.icns */; };
+		50A7D5C92CA5055400A9CBFB /* iTM.icns in Resources */ = {isa = PBXBuildFile; fileRef = 50A7D5C82CA5055400A9CBFB /* iTM.icns */; };
 		50C18C452CA4079600F9F428 /* ApplePackage in Frameworks */ = {isa = PBXBuildFile; productRef = 50C18C442CA4079600F9F428 /* ApplePackage */; };
 		50F485332CA3CEE10000FEF6 /* AppleMobileDeviceLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 50F485322CA3CEE10000FEF6 /* AppleMobileDeviceLibrary */; };
-		942B05998C6D086488506F7F /* LookInsideServer in Frameworks */ = {isa = PBXBuildFile; productRef = 823A6B347E1738583C5A86E2 /* LookInsideServer */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,7 +41,7 @@
 		507CF2C72CA6A94300B581CF /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = en.lproj/PrivacyPolicy.txt; sourceTree = "<group>"; };
 		507CF2CA2CA6A94400B581CF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hans"; path = "zh-Hans.lproj/PrivacyPolicy.txt"; sourceTree = "<group>"; };
 		508BA0022CB630F800E8FD1B /* Entitlements-Subprocess.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Entitlements-Subprocess.entitlements"; sourceTree = "<group>"; };
-		50A7D5C82CA5055400A9CBFB /* MobileTransfer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = MobileTransfer.icns; sourceTree = "<group>"; };
+		50A7D5C82CA5055400A9CBFB /* iTM.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = iTM.icns; sourceTree = "<group>"; };
 		50DB49582CA3B68400A8078B /* EmbedMobileBackup.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = EmbedMobileBackup.sh; sourceTree = "<group>"; };
 		50DB495B2CA3B69200A8078B /* EmbedMobileInstall.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = EmbedMobileInstall.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -94,7 +93,6 @@
 				50F485332CA3CEE10000FEF6 /* AppleMobileDeviceLibrary in Frameworks */,
 				508BA0052CB63BB700E8FD1B /* DockProgress in Frameworks */,
 				5046A1EC2CC82286003A8D9E /* WindowAnimation in Frameworks */,
-				942B05998C6D086488506F7F /* LookInsideServer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,7 +143,7 @@
 			isa = PBXGroup;
 			children = (
 				505F4C172CA2E86F008BE817 /* Assets.xcassets */,
-				50A7D5C82CA5055400A9CBFB /* MobileTransfer.icns */,
+				50A7D5C82CA5055400A9CBFB /* iTM.icns */,
 				507CF2BD2CA69FA200B581CF /* License.txt */,
 				507CF2C82CA6A94300B581CF /* PrivacyPolicy.txt */,
 				507CF2C42CA6A7D000B581CF /* TermOfService.txt */,
@@ -192,7 +190,6 @@
 				508BA0042CB63BB700E8FD1B /* DockProgress */,
 				50A4C9692CC1089000954D3E /* ConfettiSwiftUI */,
 				5046A1EB2CC82286003A8D9E /* WindowAnimation */,
-				823A6B347E1738583C5A86E2 /* LookInsideServer */,
 			);
 			productName = MobileTransfer;
 			productReference = 505F4BCF2CA2E709008BE817 /* MobileTransfer.app */;
@@ -234,7 +231,6 @@
 				50A4C9682CC1089000954D3E /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
 				50B420992CC8216D009F4C52 /* XCRemoteSwiftPackageReference "WindowAnimation" */,
 				50C18C502CA4079600F9F428 /* XCRemoteSwiftPackageReference "ApplePackage" */,
-				77DA8A0B595377926E75C342 /* XCRemoteSwiftPackageReference "LookInside-Release" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 505F4BD02CA2E709008BE817 /* Products */;
@@ -257,7 +253,7 @@
 				505386A52CA3CB560087A63A /* Localizable.xcstrings in Resources */,
 				507CF2C92CA6A94300B581CF /* PrivacyPolicy.txt in Resources */,
 				505F4C202CA2E86F008BE817 /* Assets.xcassets in Resources */,
-				50A7D5C92CA5055400A9CBFB /* MobileTransfer.icns in Resources */,
+				50A7D5C92CA5055400A9CBFB /* iTM.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -373,7 +369,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 964G86XT2P;
+				DEVELOPMENT_TEAM = BK368UYPY3;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -441,7 +437,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 964G86XT2P;
+				DEVELOPMENT_TEAM = BK368UYPY3;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -475,7 +471,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_APP_SANDBOX = YES;
@@ -489,18 +485,18 @@
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MobileTransfer/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = MobileTransfer;
+				INFOPLIST_KEY_CFBundleDisplayName = iTM;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Lakr Aream. All Rights Reserved.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 Lakr Aream. iTM modifications © 2026 nooTag Tech.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.0.2;
+				MARKETING_VERSION = 0.1.0;
 				OTHER_CODE_SIGN_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = wiki.qaq.MobileTransfer;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = tech.nootag.itm;
+				PRODUCT_NAME = iTM;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -518,7 +514,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_APP_SANDBOX = YES;
@@ -530,24 +526,20 @@
 				ENABLE_RESOURCE_ACCESS_USB = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
-				EXCLUDED_SOURCE_FILE_NAMES = (
-					"$(inherited)",
-					"LookInsideServer*",
-				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MobileTransfer/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = MobileTransfer;
+				INFOPLIST_KEY_CFBundleDisplayName = iTM;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Lakr Aream. All Rights Reserved.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 Lakr Aream. iTM modifications © 2026 nooTag Tech.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.0.2;
+				MARKETING_VERSION = 0.1.0;
 				OTHER_CODE_SIGN_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = wiki.qaq.MobileTransfer;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = tech.nootag.itm;
+				PRODUCT_NAME = iTM;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -649,14 +641,6 @@
 				minimumVersion = 1.0.1772947744;
 			};
 		};
-		77DA8A0B595377926E75C342 /* XCRemoteSwiftPackageReference "LookInside-Release" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/LookInsideApp/LookInside-Release.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.2.2;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -708,11 +692,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 50F485312CA3CEE10000FEF6 /* XCRemoteSwiftPackageReference "AppleMobileDeviceLibrary" */;
 			productName = AppleMobileDeviceLibrary;
-		};
-		823A6B347E1738583C5A86E2 /* LookInsideServer */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 77DA8A0B595377926E75C342 /* XCRemoteSwiftPackageReference "LookInside-Release" */;
-			productName = LookInsideServer;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
