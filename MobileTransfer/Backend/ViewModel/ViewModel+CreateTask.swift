@@ -96,8 +96,11 @@ extension ViewModel {
         NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 
-    func pickSaveLocation() {
-        guard let window = NSApp.windows.first else { return }
+    func pickSaveLocation(completion: ((Bool) -> Void)? = nil) {
+        guard let window = NSApp.mainWindow ?? NSApp.windows.first else {
+            completion?(false)
+            return
+        }
 
         let currentURL = URL(fileURLWithPath: backupLocation)
         let currentName = currentURL.lastPathComponent
@@ -112,12 +115,21 @@ extension ViewModel {
         panel.message = NSLocalizedString("Choose a Location to Save Backup", comment: "")
 
         panel.beginSheetModal(for: window) { response in
-            guard response == .OK, let newUrl = panel.url else { return }
-            try? FileManager.default.createDirectory(
-                at: newUrl,
-                withIntermediateDirectories: true
-            )
-            self.backupLocation = newUrl.path
+            guard response == .OK, let newUrl = panel.url else {
+                completion?(false)
+                return
+            }
+            do {
+                try FileManager.default.createDirectory(
+                    at: newUrl,
+                    withIntermediateDirectories: true
+                )
+                self.backupLocation = newUrl.path
+                completion?(true)
+            } catch {
+                NSAlert(error: error).beginSheetModal(for: window)
+                completion?(false)
+            }
         }
     }
 

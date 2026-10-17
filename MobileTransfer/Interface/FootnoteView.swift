@@ -10,25 +10,6 @@ import SwiftUI
 struct FootnoteView: View {
     @Environment(ViewModel.self) var vm
 
-    var footnote: LocalizedStringKey {
-        switch vm.mode {
-        case .unspecified:
-            return "iOS TimeMachine"
-        case .backup:
-            if let did = vm.deviceIdentifier {
-                return "Backup Mode \(did)"
-            } else {
-                return "Backup Mode"
-            }
-        case .restore:
-            if let did = vm.deviceIdentifier {
-                return "Restore Mode \(did)"
-            } else {
-                return "Restore Mode"
-            }
-        }
-    }
-
     var version: String {
         "v\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")"
     }
@@ -60,12 +41,14 @@ struct FootnoteView: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-            } else {
-                Text(footnote)
+            } else if vm.page == .welcome || vm.page == .actionMenu {
+                Text("iOS TimeMachine")
                     .lineLimit(1)
                     .frame(maxWidth: .infinity)
                     .multilineTextAlignment(.center)
                     .contentTransition(.numericText())
+            } else {
+                Spacer()
             }
             Text(version)
                 .lineLimit(1)
@@ -75,8 +58,6 @@ struct FootnoteView: View {
                 .frame(width: 100, alignment: .trailing)
         }
         .animation(.spring, value: vm.page)
-        .animation(.spring, value: vm.mode)
-        .animation(.spring, value: vm.deviceIdentifier)
         .font(.body)
         .onChange(of: showBackButton) { _, newValue in
             if !newValue {

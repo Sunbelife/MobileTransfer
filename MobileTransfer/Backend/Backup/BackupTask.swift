@@ -88,6 +88,8 @@ class BackupTask: Identifiable {
         group.wait()
         assert(completed)
 
+        guard deviceDataTask.success else { return }
+
         let backupLocation = parameter.backupLocation
         let info = Archives.validateRestoreArchive(at: backupLocation)
         DispatchQueue.main.asyncAndWait {

@@ -184,6 +184,10 @@ struct FindDeviceView: View {
             return
         }
         vm.deviceIdentifier = device.udid
+        vm.selectedDeviceName = device.deviceName
+        vm.selectedDeviceModel = device.modelName
+        vm.selectedDeviceVersion = device.deviceRecord?.productVersion
+        vm.selectedDeviceIcon = device.deviceSystemIcon
 
         var backupName: String = device.deviceRecord?.deviceName ?? ""
         if backupName.isEmpty { backupName = device.udid }
@@ -200,10 +204,7 @@ struct FindDeviceView: View {
             vm.backupLocation = ViewModel.defaultBackupLocation
                 .appendingPathComponent("\(backupName)-\(date).mobiletransfer")
                 .path
-            vm.pickSaveLocation()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                vm.page = .prepareBackup
-            }
+            vm.page = .prepareBackup
         case .restore:
             if vm.restoreLocation == nil {
                 vm.pickRestoreArchive()

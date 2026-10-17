@@ -174,7 +174,9 @@ class MobileBackupTask: Identifiable {
             decodeOutput("\n\n\n")
             requiresMainThread {
                 self.pid = nil
-                if self.overall.completedUnitCount != self.overall.totalUnitCount {
+                if self.error == nil,
+                   self.overall.completedUnitCount != self.overall.totalUnitCount
+                {
                     self.overall.totalUnitCount = 100
                     self.overall.completedUnitCount = 100
                 }
@@ -218,13 +220,14 @@ class MobileBackupTask: Identifiable {
     // MARK: OUTPUT HANDLER
 
     private func decodeReceipt(_ recp: AuxiliaryExecute.ExecuteReceipt) {
-        overall.totalUnitCount = 100
-        overall.completedUnitCount = 100
         self.recp = recp
-        status = .completed
         if recp.exitCode != 0, error == nil {
             error = .unexpectedExitCode
+        } else if error == nil {
+            overall.totalUnitCount = 100
+            overall.completedUnitCount = 100
         }
+        status = .completed
     }
 
     @ObservationIgnored

@@ -1475,6 +1475,9 @@ static void print_usage(int argc, char **argv, int is_error)
 
 int main(int argc, char *argv[])
 {
+	setvbuf(stdout, NULL, _IONBF, 0);
+	setvbuf(stderr, NULL, _IONBF, 0);
+
 	idevice_error_t ret = IDEVICE_E_UNKNOWN_ERROR;
 	lockdownd_error_t ldret = LOCKDOWN_E_UNKNOWN_ERROR;
 	int i = 0;
@@ -2015,6 +2018,7 @@ checkpoint:
 			/* TODO: verify battery on AC enough battery remaining */
 
 			/* re-create Info.plist (Device infos, IC-Info.sidb, photos, app_ids, iTunesPrefs) */
+			printf("Collecting device information...\n");
 			if (info_plist) {
 				plist_free(info_plist);
 				info_plist = NULL;
@@ -2027,6 +2031,7 @@ checkpoint:
 			remove_file(info_path);
 			plist_write_to_file(info_plist, info_path, PLIST_FORMAT_XML, 0);
 			free(info_path);
+			printf("Device information collected.\n");
 
 			plist_free(info_plist);
 			info_plist = NULL;

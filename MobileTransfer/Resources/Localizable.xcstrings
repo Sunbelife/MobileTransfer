@@ -266,6 +266,16 @@
         }
       }
     },
+    "Backup failed before completion. The partial archive cannot be restored." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "备份未完成，当前文件不能用于恢复。"
+          }
+        }
+      }
+    },
     "Backup Mode" : {
       "localizations" : {
         "zh-Hans" : {
@@ -282,6 +292,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "备份模式 %@"
+          }
+        }
+      }
+    },
+    "Backup password is required to restore an encrypted backup. Please keep it safe." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复加密备份需要备份密码。请妥善保管。"
           }
         }
       }
@@ -456,6 +476,16 @@
         }
       }
     },
+    "Confirm Password" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确认密码"
+          }
+        }
+      }
+    },
     "Contact Us" : {
       "localizations" : {
         "zh-Hans" : {
@@ -566,12 +596,32 @@
         }
       }
     },
+    "Could not check backup encryption. Reconnect the device and try again." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法检查备份加密状态。请重新连接设备后重试。"
+          }
+        }
+      }
+    },
     "Could not check the backup encryption status of this device, please proceed with caution." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "未能检查此设备的备份加密状态，请谨慎操作。"
+          }
+        }
+      }
+    },
+    "Could not enable backup encryption. Check the device and try again." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法启用备份加密。请检查设备后重试。"
           }
         }
       }
@@ -702,12 +752,42 @@
         }
       }
     },
+    "Enable Encryption" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "启用加密"
+          }
+        }
+      }
+    },
+    "Enabling backup encryption… Confirm on your device if asked." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在启用备份加密…如设备提示，请在设备上确认。"
+          }
+        }
+      }
+    },
     "Encrypted Backup" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "加密备份"
+          }
+        }
+      }
+    },
+    "Encrypted backups include saved passwords and Health data. Keep the backup password safe; it is required to restore the backup." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加密备份包含已保存的密码和“健康”数据。请妥善保管备份密码；恢复备份时必须使用该密码。"
           }
         }
       }
@@ -1232,6 +1312,16 @@
         }
       }
     },
+    "New Password" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新密码"
+          }
+        }
+      }
+    },
     "Next" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1282,12 +1372,32 @@
         }
       }
     },
+    "Opening Save Dialog…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在打开存储位置选择…"
+          }
+        }
+      }
+    },
     "Password" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "密码"
+          }
+        }
+      }
+    },
+    "Passwords do not match." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "两次输入的密码不一致。"
           }
         }
       }
@@ -1398,6 +1508,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "准备恢复"
+          }
+        }
+      }
+    },
+    "Preparing backup…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在准备备份…"
+          }
+        }
+      }
+    },
+    "Preparing backup… Check your iPhone for a trust or passcode prompt." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在准备备份…请留意 iPhone 上的信任或密码提示。"
           }
         }
       }
@@ -1568,6 +1698,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "选取的文件不是文件夹"
+          }
+        }
+      }
+    },
+    "Set Backup Password" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置备份密码"
           }
         }
       }
@@ -1784,6 +1924,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "系统数据，如照片、音乐、信息等，将会被合并。"
+          }
+        }
+      }
+    },
+    "System Version" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统版本"
           }
         }
       }

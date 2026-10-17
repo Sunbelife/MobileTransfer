@@ -53,7 +53,7 @@ struct BackupDeviceDataTaskView: View {
               task.current.fractionCompleted < 1,
               task.current.completedUnitCount > 0,
               task.current.totalUnitCount > 0
-        else { return "..." }
+        else { return String(localized: "Preparing backup… Check your iPhone for a trust or passcode prompt.") }
         let char = "="
         let charCountMax = 10
         let charCount = Int(task.current.fractionCompleted * Double(charCountMax))
@@ -80,6 +80,10 @@ struct BackupDeviceDataTaskView: View {
             LazyVStack(alignment: .leading, spacing: 4) {
                 if !currentProgress.isEmpty {
                     HStack(alignment: .top, spacing: 8) {
+                        if task.current.completedUnitCount == 0 {
+                            ProgressView()
+                                .controlSize(.small)
+                        }
                         Text(Date().formatted(date: .omitted, time: .shortened))
                         Text(":")
                         Text(currentProgress)

@@ -12,6 +12,9 @@ struct BackupProgressView: View {
 
     var hint: LocalizedStringKey {
         if let tvm = vm.backupTask {
+            if !tvm.deviceDataTask.success {
+                return "Backup failed before completion. The partial archive cannot be restored."
+            }
             switch tvm.verificationStatus {
             case .failed:
                 return "Failed to verify this backup, please use with caution."
@@ -35,8 +38,8 @@ struct BackupProgressView: View {
                     Text(hint)
                         .contentTransition(.numericText())
                         .transition(.opacity.combined(with: .scale(scale: 0.9)))
-                        .foregroundColor(tvm.verificationStatus == .failed ? .red : .accent)
-                        .underline(tvm.verificationStatus == .failed)
+                        .foregroundColor(tvm.verificationStatus == .failed || !tvm.deviceDataTask.success ? .red : .accent)
+                        .underline(tvm.verificationStatus == .failed || !tvm.deviceDataTask.success)
                         .onChange(of: tvm.verificationStatus) { _, newValue in
                             if newValue == .failed {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -59,7 +62,6 @@ struct BackupProgressView: View {
         .animation(.spring, value: vm.backupTask?.verificationStatus)
         .animation(.spring, value: vm.backupTask?.completed)
         .onAppear { vm.createBackupTask() }
-        .onAppear { presentPasswordAlert() }
         .padding(.bottom, 16)
     }
 
@@ -102,19 +104,5 @@ struct BackupProgressView: View {
             }
         }
         .buttonStyle(.plain)
-    }
-
-    func presentPasswordAlert() {
-        guard let progress = vm.backupTask?.deviceDataTask.overall,
-              progress.fractionCompleted == 0
-        else { return }
-        guard let window = NSApp.mainWindow else { return }
-
-        let alert = NSAlert()
-        alert.messageText = NSLocalizedString("Backup Requested", comment: "")
-        alert.informativeText = NSLocalizedString("Please enter the password on the device if needed", comment: "")
-        alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
-
-        alert.beginSheetModal(for: window)
     }
 }

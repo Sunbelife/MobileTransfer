@@ -5,130 +5,150 @@
 //  Created by 秋星桥 on 2024/9/25.
 //
 
+import AuxiliaryExecute
+import Combine
 import SwiftUI
 
 struct BackupEncryptionIndicatorView: View {
-    @Environment(ViewModel.self) var vm
+    @Environment(ViewModel.self) private var vm
+    @Binding var isEnabling: Bool
 
-    enum BackupEncryptionStatus {
+    private enum Status {
         case finding
         case unknown
-        case yes
-        case no
+        case enabled
+        case disabled
     }
 
-    @State var status: BackupEncryptionStatus = .finding
+    @State private var status: Status = .finding
+    @State private var showPasswordSheet = false
+    @State private var showEnableError = false
+    @State private var password = ""
+    @State private var confirmation = ""
 
-    @State var helpURL: String?
-
-    let timer = Timer
-        .publish(every: 5, on: .main, in: .common)
-        .autoconnect()
+    private let timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
 
     var body: some View {
         CardContentView {
-            CardContentHeader(icon: "lock", title: "Backup Encryption") {
-                switch status {
-                case .finding: Image(systemName: "hourglass")
-                case .unknown: Image(systemName: "questionmark.circle.fill")
-                case .yes: Image(systemName: "lock.fill")
-                case .no: Image(systemName: "lock.open.fill")
+            HStack(spacing: 8) {
+                Toggle("Encrypted Backup", isOn: Binding(
+                    get: { status == .enabled },
+                    set: { if $0 { showPasswordSheet = true } }
+                ))
+                .toggleStyle(.checkbox)
+                .disabled(isEnabling || status != .disabled)
+
+                Image(systemName: "exclamationmark.circle")
+                    .foregroundStyle(.secondary)
+                    .help("Encrypted backups include saved passwords and Health data. Keep the backup password safe; it is required to restore the backup.")
+                    .accessibilityLabel("Encrypted backups include saved passwords and Health data. Keep the backup password safe; it is required to restore the backup.")
+
+                Spacer()
+
+                if isEnabling || status == .finding {
+                    ProgressView()
+                        .controlSize(.small)
                 }
             }
-            switch status {
-            case .finding:
-                Text("Checking backup encryption...")
-            case .unknown:
-                Text("Could not check the backup encryption status of this device, please proceed with caution.")
-                    .foregroundStyle(.red)
-                    .underline()
-            case .yes:
-                Text("This device has a backup password set, you will need the password to use this backup.")
-                Divider()
-                CheckLabel(check: true, text: "Encrypted Backup")
-                CheckLabel(check: true, text: "System Data (photos, contacts, messages, emails...)")
-                CheckLabel(check: true, text: "App Data (data from apps installed from the App Store)")
-                CheckLabel(check: true, text: "Encrypted Data (keychain, etc.)")
-                CheckLabel(check: false, text: "Data Excluded By App (some game resources, etc.)")
-                Divider()
-                Button {
-                    helpURL = "https://support.apple.com/108313"
-                } label: {
-                    Text("Forgot password?")
-                        .underline()
-                        .foregroundStyle(.accent)
-                }
-                .buttonStyle(.plain)
-            case .no:
-                Text("This device does not have a backup password set.")
-                Text("If you continue without encryption, the backup will not include sensitive data. Restoring a device from the backup will result in loss of stored passwords, Health and HomeKit data.")
-                    .foregroundStyle(.red)
-                    .underline()
-                Divider()
-                CheckLabel(check: false, text: "Encrypted Backup")
-                CheckLabel(check: true, text: "System Data (photos, contacts, messages, emails...)")
-                CheckLabel(check: true, text: "App Data (data from apps installed from the App Store)")
-                CheckLabel(check: false, text: "Encrypted Data (keychain, etc.)")
-                CheckLabel(check: false, text: "Data Excluded By App (some game resources, etc.)")
-                Divider()
-                Button {
-                    helpURL = "https://support.apple.com/108353"
-                } label: {
-                    Text("Learn More (Enable Encrypted Backup)")
-                        .underline()
-                        .foregroundStyle(.blue)
-                }
-                .buttonStyle(.plain)
+
+            if isEnabling {
+                Text("Enabling backup encryption… Confirm on your device if asked.")
+                    .foregroundStyle(.secondary)
+            } else if status == .unknown {
+                Text("Could not check backup encryption. Reconnect the device and try again.")
+                    .foregroundStyle(.orange)
             }
         }
-        .animation(.spring, value: status)
         .onAppear { updateDeviceStatus() }
         .onReceive(timer) { _ in updateDeviceStatus() }
-        .sheet(item: $helpURL) {
-            WebSheetView(url: URL(string: $0))
-        }
-    }
-
-    struct CheckLabel: View {
-        let check: Bool
-        let text: LocalizedStringKey
-
-        var body: some View {
-            HStack(spacing: 8) {
-                Image(
-                    systemName: check
-                        ? "checkmark.circle.fill" : "xmark.circle.fill"
-                )
-                .foregroundStyle(check ? .green : .red)
-                Text(text)
-            }
-        }
-    }
-
-    func updateDeviceStatus() {
-        guard let udid = vm.deviceIdentifier else { return }
-        if status == .unknown { status = .finding }
-        DispatchQueue.global().async {
-            var enabled: Bool? = nil
-            if let read = AppleMobileDeviceManager.shared.readFromLockdown(
-                udid: udid,
-                domain: "com.apple.mobile.backup",
-                key: nil,
-                connection: .usb
-            ), let dic = read.value as? [String: Any],
-            let value = dic["WillEncrypt"] as? Bool
-            { enabled = value }
-
-            DispatchQueue.main.async {
-                withAnimation(.spring) {
-                    if let enabled {
-                        status = enabled ? .yes : .no
-                    } else {
-                        status = .unknown
+        .sheet(isPresented: $showPasswordSheet, onDismiss: {
+            password = ""
+            confirmation = ""
+        }) {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Set Backup Password")
+                    .font(.title3)
+                    .bold()
+                Text("Backup password is required to restore an encrypted backup. Please keep it safe.")
+                    .foregroundStyle(.secondary)
+                SecureField("New Password", text: $password)
+                SecureField("Confirm Password", text: $confirmation)
+                if !confirmation.isEmpty && password != confirmation {
+                    Text("Passwords do not match.")
+                        .foregroundStyle(.red)
+                }
+                HStack {
+                    Spacer()
+                    Button("Cancel") { closePasswordSheet() }
+                    Button("Enable Encryption") {
+                        let newPassword = password
+                        closePasswordSheet()
+                        enableEncryption(with: newPassword)
                     }
-                    vm.backupEncrypted = enabled ?? false
+                    .disabled(password.isEmpty || password != confirmation)
+                    .keyboardShortcut(.defaultAction)
+                }
+            }
+            .padding(24)
+            .frame(width: 420)
+        }
+        .alert("Could not enable backup encryption. Check the device and try again.", isPresented: $showEnableError) {
+            Button("OK", role: .cancel) {}
+        }
+    }
+
+    private func closePasswordSheet() {
+        showPasswordSheet = false
+        password = ""
+        confirmation = ""
+    }
+
+    private func enableEncryption(with password: String) {
+        guard let udid = vm.deviceIdentifier else { return }
+        isEnabling = true
+        DispatchQueue.global(qos: .userInitiated).async {
+            AuxiliaryExecute.spawn(
+                command: MobileBackupTask.mobileBackupExecutable,
+                args: ["-u", udid, "encryption", "on"],
+                environment: ["BACKUP_PASSWORD": password],
+                timeout: 180
+            )
+            var enabled: Bool?
+            for attempt in 0..<5 {
+                enabled = Self.readDeviceStatus(udid: udid)
+                if enabled == true { break }
+                if attempt < 4 { Thread.sleep(forTimeInterval: 1) }
+            }
+            DispatchQueue.main.async {
+                isEnabling = false
+                status = enabled.map { $0 ? .enabled : .disabled } ?? .unknown
+                vm.backupEncrypted = enabled ?? false
+                if enabled != true {
+                    showEnableError = true
                 }
             }
         }
+    }
+
+    private func updateDeviceStatus() {
+        guard !isEnabling, let udid = vm.deviceIdentifier else { return }
+        DispatchQueue.global(qos: .utility).async {
+            let enabled = Self.readDeviceStatus(udid: udid)
+            DispatchQueue.main.async {
+                guard !isEnabling else { return }
+                status = enabled.map { $0 ? .enabled : .disabled } ?? .unknown
+                vm.backupEncrypted = enabled ?? false
+            }
+        }
+    }
+
+    private static func readDeviceStatus(udid: String) -> Bool? {
+        guard let read = AppleMobileDeviceManager.shared.readFromLockdown(
+            udid: udid,
+            domain: "com.apple.mobile.backup",
+            key: nil,
+            connection: .usb
+        ), let values = read.value as? [String: Any] else { return nil }
+        return values["WillEncrypt"] as? Bool
     }
 }

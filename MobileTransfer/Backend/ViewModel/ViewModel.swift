@@ -40,6 +40,10 @@ class ViewModel {
     var mode: Mode = .unspecified
 
     var deviceIdentifier: String?
+    var selectedDeviceName: String?
+    var selectedDeviceModel: String?
+    var selectedDeviceVersion: String?
+    var selectedDeviceIcon = "iphone"
 
     // MARK: - backup
 
@@ -135,6 +139,10 @@ class ViewModel {
         restoreTask?.terminate()
         applicationInstallTask?.terminate()
         deviceIdentifier = nil
+        selectedDeviceName = nil
+        selectedDeviceModel = nil
+        selectedDeviceVersion = nil
+        selectedDeviceIcon = "iphone"
         mode = .unspecified
         backupApps = showAppPackageDownloadPanel
         backupEncrypted = false
