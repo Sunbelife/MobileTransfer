@@ -8,103 +8,148 @@
 import SwiftUI
 
 struct BackupDeviceDataTaskView: View {
-    let spacing: CGFloat = 16
+    let task: MobileBackupTask
 
-    var task: MobileBackupTask
+    @State private var showingDetails = false
 
-    var overall: String {
+    private var hasOverallProgress: Bool {
+        task.overall.completedUnitCount > 0
+    }
+
+    private var overallPercent: String {
         "\(Int(task.overall.fractionCompleted * 100))%"
+    }
+
+    private var currentTransfer: String? {
+        guard task.hasStartedTransfer,
+              task.current.totalUnitCount > 0
+        else { return nil }
+
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        let received = formatter.string(fromByteCount: task.current.completedUnitCount)
+        let total = formatter.string(fromByteCount: task.current.totalUnitCount)
+        return "\(received) / \(total)"
     }
 
     var body: some View {
         CardContentView {
-            CardContentHeader(
-                icon: "arrow.right.doc.on.clipboard",
-                title: "Backup"
-            ) {
+            HStack(spacing: 10) {
+                Image(systemName: "arrow.right.doc.on.clipboard")
+                    .accessibilityHidden(true)
+                Text("Backup")
+                    .bold()
+                Spacer()
                 if task.completed {
-                    if task.success {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
-                            .transition(.opacity.combined(with: .scale))
-                    } else {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.red)
-                            .transition(.opacity.combined(with: .scale))
-                    }
-                } else {
-                    Text(overall)
-                        .multilineTextAlignment(.trailing)
-                        .contentTransition(.numericText())
-                        .transition(.opacity.combined(with: .scale))
+                    Image(systemName: task.success ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        .foregroundStyle(task.success ? .green : .red)
+                        .accessibilityHidden(true)
+                } else if hasOverallProgress {
+                    Text(overallPercent)
+                        .monospacedDigit()
+                }
+                Button {
+                    showingDetails = true
+                } label: {
+                    Image(systemName: "exclamationmark.circle")
+                        .font(.title3)
+                }
+                .buttonStyle(.plain)
+                .help("View backup details")
+                .accessibilityLabel("View backup details")
+                .popover(isPresented: $showingDetails, arrowEdge: .trailing) {
+                    details
                 }
             }
-            .animation(.spring, value: task.completed)
-            .animation(.spring, value: task.overall)
-            VStack(alignment: .leading, spacing: 8) {
-                content.frame(maxWidth: .infinity, alignment: .leading)
-            }
-        }
-    }
 
-    var currentProgress: String {
-        guard !task.completed else { return "" }
-        guard task.current.fractionCompleted > 0,
-              task.current.fractionCompleted < 1,
-              task.current.completedUnitCount > 0,
-              task.current.totalUnitCount > 0
-        else { return String(localized: "Preparing backup… Check your iPhone for a trust or passcode prompt.") }
-        let char = "="
-        let charCountMax = 10
-        let charCount = Int(task.current.fractionCompleted * Double(charCountMax))
-        let charCountLeft = charCountMax - charCount
-        let valueA = String(repeating: char, count: charCount)
-        let valueB = String(repeating: " ", count: charCountLeft)
-        let percent = Int(task.current.fractionCompleted * 100)
-        let bytesFmt = ByteCountFormatter()
-        bytesFmt.allowedUnits = [.useAll]
-        bytesFmt.countStyle = .file
-        let done = bytesFmt.string(fromByteCount: task.current.completedUnitCount)
-        let total = bytesFmt.string(fromByteCount: task.current.totalUnitCount)
-        return "Receiving \(total) - [\(valueA)>\(valueB)] \(percent)% (\(done))"
+            VStack(alignment: .leading, spacing: 18) {
+                status
+                    .font(.title2.weight(.semibold))
+
+                Group {
+                    if task.completed || hasOverallProgress {
+                        ProgressView(
+                            value: Double(task.overall.completedUnitCount),
+                            total: Double(max(task.overall.totalUnitCount, 1))
+                        )
+                    } else {
+                        ProgressView()
+                    }
+                }
+                .progressViewStyle(.linear)
+                .controlSize(.large)
+                .tint(.accentColor)
+                .scaleEffect(x: 1, y: 2.5)
+                .frame(height: 18)
+
+                supportingText
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 24)
+        }
+        .frame(maxWidth: 760)
     }
 
     @ViewBuilder
-    var content: some View {
-        ProgressView(
-            value: Double(task.overall.completedUnitCount),
-            total: Double(task.overall.totalUnitCount)
-        )
-        .progressViewStyle(.linear)
-        ScrollView(.vertical, showsIndicators: false) {
-            LazyVStack(alignment: .leading, spacing: 4) {
-                if !currentProgress.isEmpty {
-                    HStack(alignment: .top, spacing: 8) {
-                        if task.current.completedUnitCount == 0 {
-                            ProgressView()
-                                .controlSize(.small)
-                        }
-                        Text(Date().formatted(date: .omitted, time: .shortened))
-                        Text(":")
-                        Text(currentProgress)
-                    }
-                    .font(.footnote)
-                    .monospaced()
-                }
+    private var status: some View {
+        if task.completed {
+            if task.success {
+                Text("Backup complete")
+            } else {
+                Text("Backup failed")
+                    .foregroundStyle(.red)
+            }
+        } else if task.hasStartedTransfer {
+            Text("Transferring device data…")
+        } else {
+            Text("Preparing data on iPhone…")
+        }
+    }
 
-                ForEach(task.output.reversed()) { input in
-                    HStack(alignment: .top, spacing: 8) {
-                        Text(Date().formatted(date: .omitted, time: .shortened))
-                        Text(":")
-                        Text(input.text)
-                            .foregroundStyle(input.color)
-                            .textSelection(.enabled)
+    @ViewBuilder
+    private var supportingText: some View {
+        if task.completed {
+            if task.success {
+                Text("Device data has been received.")
+            } else {
+                Text("Open details to see what happened.")
+            }
+        } else if let currentTransfer {
+            HStack(spacing: 6) {
+                Text("Current batch")
+                Text(currentTransfer)
+                    .monospacedDigit()
+            }
+        } else {
+            Text("The first backup may take a few minutes to prepare. Confirm any prompt on your iPhone.")
+        }
+    }
+
+    private var details: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Backup details")
+                .font(.headline)
+            Divider()
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 6) {
+                    ForEach(task.output.reversed()) { entry in
+                        HStack(alignment: .top, spacing: 8) {
+                            Text(entry.date.formatted(date: .omitted, time: .shortened))
+                                .foregroundStyle(.secondary)
+                            Text(entry.text)
+                                .foregroundStyle(entry.color)
+                                .textSelection(.enabled)
+                        }
+                        .font(.footnote.monospaced())
                     }
-                    .font(.footnote)
-                    .monospaced()
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
+        .padding(20)
+        .frame(width: 620, height: 420)
     }
 }
 

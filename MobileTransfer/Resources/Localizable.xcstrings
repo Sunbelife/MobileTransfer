@@ -246,6 +246,26 @@
         }
       }
     },
+    "Backup complete" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "备份完成"
+          }
+        }
+      }
+    },
+    "Backup details" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "备份详情"
+          }
+        }
+      }
+    },
     "Backup Device" : {
       "localizations" : {
         "zh-Hans" : {
@@ -262,6 +282,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "备份加密"
+          }
+        }
+      }
+    },
+    "Backup failed" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "备份失败"
           }
         }
       }
@@ -626,12 +656,32 @@
         }
       }
     },
+    "Current batch" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前批次"
+          }
+        }
+      }
+    },
     "Data Excluded By App (some game resources, etc.)" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "已设置不可备份的数据（部分游戏资源等）"
+          }
+        }
+      }
+    },
+    "Device data has been received." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已接收设备数据。"
           }
         }
       }
@@ -1372,6 +1422,16 @@
         }
       }
     },
+    "Open details to see what happened." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开详情查看具体情况。"
+          }
+        }
+      }
+    },
     "Opening Save Dialog…" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1522,12 +1582,12 @@
         }
       }
     },
-    "Preparing backup… Check your iPhone for a trust or passcode prompt." : {
+    "Preparing data on iPhone…" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在准备备份…请留意 iPhone 上的信任或密码提示。"
+            "value" : "iPhone 正在准备数据…"
           }
         }
       }
@@ -2024,6 +2084,16 @@
         }
       }
     },
+    "The first backup may take a few minutes to prepare. Confirm any prompt on your iPhone." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "首次备份可能需要几分钟准备。请在 iPhone 上确认出现的提示。"
+          }
+        }
+      }
+    },
     "The iTM installed on this computer is licensed to:" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2206,6 +2276,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "试用用户"
+          }
+        }
+      }
+    },
+    "Transferring device data…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在传输设备数据…"
           }
         }
       }
@@ -2424,6 +2504,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "验证下载内容…"
+          }
+        }
+      }
+    },
+    "View backup details" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看备份详情"
           }
         }
       }

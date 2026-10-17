@@ -116,6 +116,7 @@ class MobileBackupTask: Identifiable {
     }
 
     var error: BackupError?
+    var hasStartedTransfer = false
 
     enum BackupStatus {
         case initialized
@@ -280,7 +281,10 @@ class MobileBackupTask: Identifiable {
             let prog = Progress(totalUnitCount: Int64(total))
             prog.completedUnitCount = Int64(curr)
             guard current != prog else { return }
-            requiresMainThread { self.current = prog }
+            requiresMainThread {
+                self.hasStartedTransfer = true
+                self.current = prog
+            }
             return
         }
 

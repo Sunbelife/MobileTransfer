@@ -30,8 +30,10 @@ struct BackupProgressView: View {
     var body: some View {
         VStack(spacing: 16) {
             if let tvm = vm.backupTask {
+                Spacer(minLength: 0)
                 BackupTaskView(task: tvm)
                     .transition(.opacity)
+                Spacer(minLength: 0)
 
                 if tvm.completed {
                     showInFinder
