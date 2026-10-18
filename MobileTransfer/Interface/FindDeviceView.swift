@@ -140,10 +140,8 @@ struct FindDeviceView: View {
             }
             .overlay {
                 if deviceList.isEmpty {
-                    Image(.computerSmartphoneConnect)
-                        .resizable()
-                        .renderingMode(.template)
-                        .scaledToFit()
+                    Image(systemName: "laptopcomputer.and.iphone")
+                        .font(.system(size: 96, weight: .ultraLight))
                         .foregroundStyle(.primary.opacity(0.7))
                         .frame(width: 128, height: 128)
                         .frame(maxHeight: .infinity, alignment: .center)
