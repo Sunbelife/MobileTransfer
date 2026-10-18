@@ -85,6 +85,7 @@ struct FindDeviceView: View {
         .autoconnect()
 
     @State private var isScanning = false
+    @State private var scanID: UUID?
     @State private var deviceList: [UnregisteredDevice] = []
     @State private var openTrustPage: Bool = false
 
@@ -100,6 +101,16 @@ struct FindDeviceView: View {
 
     var body: some View {
         VStack(spacing: 16) {
+            HStack {
+                Button {
+                    vm.navigationArray = [.welcome]
+                } label: {
+                    Label("Back", systemImage: "chevron.left")
+                }
+                .buttonStyle(.plain)
+                .keyboardShortcut(.cancelAction)
+                Spacer()
+            }
             Text(title)
                 .frame(maxWidth: .infinity)
                 .contentTransition(.numericText())
@@ -109,12 +120,16 @@ struct FindDeviceView: View {
                     ForEach(deviceList) { device in
                         UnregisteredDeviceView(device: device) {
                             if !device.trusted {
-                                AppleMobileDeviceManager.shared.sendPairRequest(
-                                    udid: device.id,
-                                    connection: .usb
-                                )
+                                openTrustPage = true
+                                DispatchQueue.global(qos: .userInitiated).async {
+                                    AppleMobileDeviceManager.shared.sendPairRequest(
+                                        udid: device.id,
+                                        connection: .usb
+                                    )
+                                }
+                            } else {
+                                selectDevice(device)
                             }
-                            selectDevice(device.id)
                         }
                         .transition(.opacity.combined(with: .scale(scale: 0.95)))
                     }
@@ -127,7 +142,9 @@ struct FindDeviceView: View {
                 if deviceList.isEmpty {
                     Image(.computerSmartphoneConnect)
                         .resizable()
+                        .renderingMode(.template)
                         .scaledToFit()
+                        .foregroundStyle(.primary.opacity(0.7))
                         .frame(width: 128, height: 128)
                         .frame(maxHeight: .infinity, alignment: .center)
                         .transition(.opacity.combined(with: .scale(scale: 0.95)))
@@ -146,11 +163,21 @@ struct FindDeviceView: View {
         .onAppear { scan() }
         .onAppear { vm.deviceIdentifier = nil }
         .onReceive(timer) { _ in scan() }
+        .onDisappear {
+            scanID = nil
+            isScanning = false
+        }
     }
 
     func scan() {
-        guard !isScanning else { return }
+        guard scanID == nil else { return }
+        let id = UUID()
+        scanID = id
         isScanning = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
+            guard vm.page == .findDevice, scanID == id else { return }
+            isScanning = false
+        }
         DispatchQueue.global().async {
             autoreleasepool {
                 let scan = AppleMobileDeviceManager.shared
@@ -161,8 +188,9 @@ struct FindDeviceView: View {
                         return UnregisteredDevice(udid: udid, deviceRecord: input)
                     }
                     .sorted { $0.udid < $1.udid }
-                sleep(1)
                 DispatchQueue.main.async {
+                    guard vm.page == .findDevice, scanID == id else { return }
+                    scanID = nil
                     isScanning = false
                     deviceList = scan
                 }
@@ -170,19 +198,7 @@ struct FindDeviceView: View {
         }
     }
 
-    private func selectDevice(_ did: String) {
-        guard let rawDevice = AppleMobileDeviceManager.shared.obtainDeviceInfo(udid: did, connection: .usb),
-              let udid = rawDevice.uniqueDeviceID
-        else {
-            assertionFailure()
-            return
-        }
-        assert(udid == did)
-        let device = UnregisteredDevice(udid: udid, deviceRecord: rawDevice)
-        guard device.trusted else {
-            openTrustPage = true
-            return
-        }
+    private func selectDevice(_ device: UnregisteredDevice) {
         vm.deviceIdentifier = device.udid
         vm.selectedDeviceName = device.deviceName
         vm.selectedDeviceModel = device.modelName
