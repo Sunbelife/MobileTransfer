@@ -31,11 +31,13 @@ struct ContentView: View {
                     )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            FootnoteView()
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .itmGlassSurface(cornerRadius: 18)
-                .padding(.top, 16)
+            if vm.page != .welcome && vm.page != .findDevice {
+                FootnoteView()
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .itmGlassSurface(cornerRadius: 18)
+                    .padding(.top, 16)
+            }
         }
         .animation(animation, value: vm.page)
         .onChange(of: vm.page) {

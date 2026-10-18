@@ -111,10 +111,12 @@ struct FindDeviceView: View {
                 .keyboardShortcut(.cancelAction)
                 Spacer()
             }
-            Text(title)
-                .frame(maxWidth: .infinity)
-                .contentTransition(.numericText())
-                .multilineTextAlignment(.center)
+            if !deviceList.isEmpty {
+                Text(title)
+                    .frame(maxWidth: .infinity)
+                    .contentTransition(.numericText())
+                    .multilineTextAlignment(.center)
+            }
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 16) {
                     ForEach(deviceList) { device in
@@ -140,12 +142,17 @@ struct FindDeviceView: View {
             }
             .overlay {
                 if deviceList.isEmpty {
-                    Image(systemName: "laptopcomputer.and.iphone")
-                        .font(.system(size: 96, weight: .ultraLight))
-                        .foregroundStyle(.primary.opacity(0.7))
-                        .frame(width: 128, height: 128)
-                        .frame(maxHeight: .infinity, alignment: .center)
-                        .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                    VStack(spacing: 16) {
+                        Image(systemName: "laptopcomputer.and.iphone")
+                            .font(.system(size: 96, weight: .ultraLight))
+                            .foregroundStyle(.primary.opacity(0.7))
+                            .frame(width: 128, height: 80)
+                        Text(title)
+                            .contentTransition(.numericText())
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxHeight: .infinity)
+                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
                 }
             }
             .padding(-32)

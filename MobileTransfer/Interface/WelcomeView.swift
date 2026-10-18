@@ -71,7 +71,7 @@ struct WelcomeView: View {
     private var actionButtons: some View {
         VStack(spacing: 12) {
             WelcomeAction(
-                symbol: "arrow.up.doc",
+                symbol: "arrow.up.to.line",
                 title: "Backup Device",
                 detail: "Download device data and archive to selected destination"
             ) {
@@ -80,7 +80,7 @@ struct WelcomeView: View {
             }
 
             WelcomeAction(
-                symbol: "arrow.down.doc",
+                symbol: "arrow.down.to.line",
                 title: "Restore Device",
                 detail: restoreDetail
             ) {
