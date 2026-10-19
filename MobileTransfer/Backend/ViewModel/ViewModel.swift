@@ -44,6 +44,7 @@ class ViewModel {
     var selectedDeviceModel: String?
     var selectedDeviceVersion: String?
     var selectedDeviceIcon = "iphone"
+    var selectedDeviceRecord: AppleMobileDeviceManager.DeviceRecord?
 
     // MARK: - backup
 
@@ -143,6 +144,7 @@ class ViewModel {
         selectedDeviceModel = nil
         selectedDeviceVersion = nil
         selectedDeviceIcon = "iphone"
+        selectedDeviceRecord = nil
         mode = .unspecified
         backupApps = showAppPackageDownloadPanel
         backupEncrypted = false

@@ -126,6 +126,16 @@
         }
       }
     },
+    "All Device Information" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全部设备信息"
+          }
+        }
+      }
+    },
     "App data" : {
       "localizations" : {
         "zh-Hans" : {
@@ -222,6 +232,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "验证"
+          }
+        }
+      }
+    },
+    "Available Storage" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可用存储空间"
           }
         }
       }
@@ -396,6 +416,16 @@
         }
       }
     },
+    "Battery" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "电池"
+          }
+        }
+      }
+    },
     "By continuing to use the app, you agree to the agreements and policies." : {
       "localizations" : {
         "zh-Hans" : {
@@ -466,6 +496,16 @@
         }
       }
     },
+    "Change Backup Location" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更改备份位置"
+          }
+        }
+      }
+    },
     "Checking backup encryption..." : {
       "localizations" : {
         "zh-Hans" : {
@@ -492,6 +532,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "选取"
+          }
+        }
+      }
+    },
+    "Choose a backup location before starting." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始前请选择备份位置。"
           }
         }
       }
@@ -542,6 +592,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "从文件中选择备份…"
+          }
+        }
+      }
+    },
+    "Choose Backup Location" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择备份位置"
           }
         }
       }
@@ -766,12 +826,32 @@
         }
       }
     },
+    "Device" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设备"
+          }
+        }
+      }
+    },
     "Device data has been received." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "已接收设备数据。"
+          }
+        }
+      }
+    },
+    "Device Details" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设备详情"
           }
         }
       }
@@ -1219,6 +1299,16 @@
         }
       }
     },
+    "Installed Apps" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已安装应用"
+          }
+        }
+      }
+    },
     "Installing %d apps..." : {
       "localizations" : {
         "zh-Hans" : {
@@ -1502,6 +1592,16 @@
         }
       }
     },
+    "New Backup…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新建备份…"
+          }
+        }
+      }
+    },
     "New Password" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1628,6 +1728,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "两次输入的密码不一致。"
+          }
+        }
+      }
+    },
+    "Photo count is not available from device information." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法从设备信息获取照片数量。"
           }
         }
       }
@@ -1788,6 +1898,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "隐私政策"
+          }
+        }
+      }
+    },
+    "Reading device information…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在读取设备信息…"
           }
         }
       }
@@ -1978,6 +2098,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "选取的文件不是文件夹"
+          }
+        }
+      }
+    },
+    "Serial Number" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "序列号"
           }
         }
       }
@@ -2178,6 +2308,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "停止恢复"
+          }
+        }
+      }
+    },
+    "Storage" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "存储空间"
           }
         }
       }

@@ -25,7 +25,7 @@ public extension AppleMobileDeviceManager {
         instproxy_client_free(client)
     }
 
-    func listApplications(device: idevice_t) -> AnyCodableDictionary? {
+    func listApplications(device: idevice_t, includeIcons: Bool = true) -> AnyCodableDictionary? {
         var applicationDic: AnyCodableDictionary = [:]
         var fullyDecoded = false
         requireInstallProxyService(device: device) { inst_client in
@@ -56,7 +56,9 @@ public extension AppleMobileDeviceManager {
 
             var sb_client: sbservices_client_t?
             defer { if let sb_client { sbservices_client_free(sb_client) } }
-            sbservices_client_start_service(device, &sb_client, UUID().uuidString)
+            if includeIcons {
+                sbservices_client_start_service(device, &sb_client, UUID().uuidString)
+            }
 
             let appCount = plist_array_get_size(apps) // later just free apps, frees all
             for idx in 0 ..< appCount {
@@ -114,12 +116,13 @@ public extension AppleMobileDeviceManager {
 
     func listApplications(
         udid: String,
-        connection: ConnectionMethod = configuration.connectionMethod
+        connection: ConnectionMethod = configuration.connectionMethod,
+        includeIcons: Bool = true
     ) -> AnyCodableDictionary? {
         var result: AnyCodableDictionary?
         requireDevice(udid: udid, connection: connection) { device in
             guard let device else { return }
-            result = listApplications(device: device)
+            result = listApplications(device: device, includeIcons: includeIcons)
         }
         return result
     }

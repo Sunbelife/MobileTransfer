@@ -209,6 +209,7 @@ struct FindDeviceView: View {
         vm.selectedDeviceModel = device.modelName
         vm.selectedDeviceVersion = device.deviceRecord?.productVersion
         vm.selectedDeviceIcon = device.deviceSystemIcon
+        vm.selectedDeviceRecord = device.deviceRecord
 
         var backupName: String = device.deviceRecord?.deviceName ?? ""
         if backupName.isEmpty { backupName = device.udid }
