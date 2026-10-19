@@ -8,7 +8,7 @@
 import AppleMobileDeviceLibrary
 import SwiftUI
 
-private struct UnregisteredDevice: Codable, Identifiable, Hashable, Equatable {
+struct ConnectedDevice: Codable, Identifiable, Hashable, Equatable {
     var id: String {
         udid
     }
@@ -86,7 +86,7 @@ struct FindDeviceView: View {
 
     @State private var isScanning = false
     @State private var scanID: UUID?
-    @State private var deviceList: [UnregisteredDevice] = []
+    @State private var deviceList: [ConnectedDevice] = []
     @State private var openTrustPage: Bool = false
 
     var title: LocalizedStringKey {
@@ -159,7 +159,7 @@ struct FindDeviceView: View {
             .frame(maxWidth: 400)
         }
         .sheet(isPresented: $openTrustPage) {
-            TrustPageView().onDisappear {
+            DeviceTrustView().onDisappear {
                 scan()
             }
         }
@@ -188,9 +188,9 @@ struct FindDeviceView: View {
                 let scan = AppleMobileDeviceManager.shared
                     .listDeviceIdentifiers()
                     .compactMap { AppleMobileDeviceManager.shared.obtainDeviceInfo(udid: $0, connection: .usb) }
-                    .compactMap { input -> UnregisteredDevice? in
+                    .compactMap { input -> ConnectedDevice? in
                         guard let udid = input.uniqueDeviceID else { return nil }
-                        return UnregisteredDevice(udid: udid, deviceRecord: input)
+                        return ConnectedDevice(udid: udid, deviceRecord: input)
                     }
                     .sorted { $0.udid < $1.udid }
                 DispatchQueue.main.async {
@@ -203,7 +203,7 @@ struct FindDeviceView: View {
         }
     }
 
-    private func selectDevice(_ device: UnregisteredDevice) {
+    private func selectDevice(_ device: ConnectedDevice) {
         vm.deviceIdentifier = device.udid
         vm.selectedDeviceName = device.deviceName
         vm.selectedDeviceModel = device.modelName
@@ -234,7 +234,7 @@ struct FindDeviceView: View {
 }
 
 private struct UnregisteredDeviceView: View {
-    let device: UnregisteredDevice
+    let device: ConnectedDevice
     let action: () -> Void
 
     var body: some View {
@@ -278,7 +278,7 @@ private struct UnregisteredDeviceView: View {
     }
 }
 
-private struct TrustPageView: View {
+struct DeviceTrustView: View {
     var body: some View {
         MessageBoxView {
             HStack {

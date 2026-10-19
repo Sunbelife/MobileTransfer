@@ -40,7 +40,7 @@ struct BackupProgressView: View {
                     Text(hint)
                         .contentTransition(.numericText())
                         .transition(.opacity.combined(with: .scale(scale: 0.9)))
-                        .foregroundColor(tvm.verificationStatus == .failed || !tvm.deviceDataTask.success ? .red : .accent)
+                        .foregroundColor(tvm.verificationStatus == .failed || !tvm.deviceDataTask.success ? .red : .accentColor)
                         .underline(tvm.verificationStatus == .failed || !tvm.deviceDataTask.success)
                         .onChange(of: tvm.verificationStatus) { _, newValue in
                             if newValue == .failed {
@@ -101,7 +101,7 @@ struct BackupProgressView: View {
         } label: {
             CardContentView {
                 Text("Show In Finder")
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(.tint)
                     .frame(maxWidth: .infinity)
             }
         }

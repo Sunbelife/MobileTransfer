@@ -114,6 +114,35 @@ public extension AppleMobileDeviceManager {
         return applicationDic
     }
 
+    /// Streams icons after the app list is available, reusing one SpringBoard service.
+    /// Cancellation is checked between requests; a failed icon does not fail the list.
+    func readApplicationIcons(
+        udid: String,
+        identifiers: [String],
+        progress: Progress,
+        onIcon: (String, Data) -> Void
+    ) {
+        guard !progress.isCancelled else { return }
+        requireDevice(udid: udid, connection: .usb) { device in
+            guard let device, !progress.isCancelled else { return }
+            var client: sbservices_client_t?
+            guard sbservices_client_start_service(device, &client, UUID().uuidString) == SBSERVICES_E_SUCCESS,
+                  let client else { return }
+            defer { sbservices_client_free(client) }
+            for identifier in identifiers {
+                guard !progress.isCancelled else { break }
+                autoreleasepool {
+                    var buffer: UnsafeMutablePointer<CChar>?
+                    defer { free(buffer) }
+                    var length: UInt64 = 0
+                    guard sbservices_get_icon_pngdata(client, identifier, &buffer, &length) == SBSERVICES_E_SUCCESS,
+                          let buffer, length > 0 else { return }
+                    onIcon(identifier, Data(bytes: buffer, count: Int(length)))
+                }
+            }
+        }
+    }
+
     func listApplications(
         udid: String,
         connection: ConnectionMethod = configuration.connectionMethod,

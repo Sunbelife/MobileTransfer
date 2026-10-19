@@ -441,6 +441,35 @@ public extension AppleMobileDeviceManager {
         return result
     }
 
+    /// Reads related domains within one scoped USB connection and Lockdown session.
+    /// Missing domains retain the existing non-handshake fallback. Clients never escape
+    /// their owning closure and are not shared across background reads.
+    func readLockdownValues(
+        udid: String,
+        domains: [String],
+        connection: ConnectionMethod = configuration.connectionMethod
+    ) -> [String: AnyCodable] {
+        var result: [String: AnyCodable] = [:]
+        requireDevice(udid: udid, connection: connection) { device in
+            guard let device else { return }
+            requireLockdownClient(device: device, handshake: true) { client in
+                guard let client else { return }
+                for domain in domains {
+                    result[domain] = lockdownGetValue(client: client, domain: domain)
+                }
+            }
+            let missing = domains.filter { result[$0] == nil }
+            guard !missing.isEmpty else { return }
+            requireLockdownClient(device: device, handshake: false) { client in
+                guard let client else { return }
+                for domain in missing {
+                    result[domain] = lockdownGetValue(client: client, domain: domain)
+                }
+            }
+        }
+        return result
+    }
+
     func obtainDeviceInfo(
         udid: String,
         domain: String? = nil,

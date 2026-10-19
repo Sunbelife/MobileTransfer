@@ -21,14 +21,16 @@ struct MobileTransfer: SwiftUI.App {
                         .frame(width: 333, height: 222)
                 }
                 .frame(
-                    minWidth: 666, idealWidth: 666, maxWidth: .infinity,
-                    minHeight: 444, idealHeight: 444, maxHeight: .infinity,
+                    minWidth: 640, idealWidth: 1100, maxWidth: .infinity,
+                    minHeight: 560, idealHeight: 760, maxHeight: .infinity,
                     alignment: .center
                 )
                 .environment(vm)
         }
-        .windowResizability(.contentSize)
-        .windowStyle(.hiddenTitleBar)
+        .defaultSize(width: 1100, height: 760)
+        .windowResizability(.contentMinSize)
+        .windowStyle(.titleBar)
+        .windowToolbarStyle(.unified)
         .commands { commands }
     }
 

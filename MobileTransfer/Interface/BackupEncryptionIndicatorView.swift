@@ -13,14 +13,17 @@ struct BackupEncryptionIndicatorView: View {
     @Environment(ViewModel.self) private var vm
     @Binding var isEnabling: Bool
 
-    private enum Status {
+    // The parent owns the initial batched read and retains status across tab changes.
+    @Binding var status: Status
+
+    enum Status: Equatable {
         case finding
         case unknown
         case enabled
         case disabled
     }
 
-    @State private var status: Status = .finding
+    @State private var isReadingStatus = false
     @State private var showPasswordSheet = false
     @State private var showEnableError = false
     @State private var password = ""
@@ -29,19 +32,21 @@ struct BackupEncryptionIndicatorView: View {
     private let timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        CardContentView {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                Toggle("Encrypted Backup", isOn: Binding(
-                    get: { status == .enabled },
-                    set: { if $0 { showPasswordSheet = true } }
-                ))
-                .toggleStyle(.checkbox)
-                .disabled(isEnabling || status != .disabled)
-
-                Image(systemName: "exclamationmark.circle")
-                    .foregroundStyle(.secondary)
-                    .help("Encrypted backups include saved passwords and Health data. Keep the backup password safe; it is required to restore the backup.")
-                    .accessibilityLabel("Encrypted backups include saved passwords and Health data. Keep the backup password safe; it is required to restore the backup.")
+                if status == .enabled {
+                    Label("Encrypted Backup", systemImage: "lock.shield.fill")
+                    Label("Enabled", systemImage: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                        .font(.callout)
+                } else {
+                    Toggle("Encrypted Backup", isOn: Binding(
+                        get: { false },
+                        set: { if $0 { showPasswordSheet = true } }
+                    ))
+                    .toggleStyle(.checkbox)
+                    .disabled(isEnabling || status != .disabled)
+                }
 
                 Spacer()
 
@@ -51,6 +56,10 @@ struct BackupEncryptionIndicatorView: View {
                 }
             }
 
+            Text("Encrypted backups include saved passwords and Health data. Keep the backup password safe; it is required to restore the backup.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
             if isEnabling {
                 Text("Enabling backup encryption… Confirm on your device if asked.")
                     .foregroundStyle(.secondary)
@@ -59,8 +68,9 @@ struct BackupEncryptionIndicatorView: View {
                     .foregroundStyle(.orange)
             }
         }
-        .onAppear { updateDeviceStatus() }
-        .onReceive(timer) { _ in updateDeviceStatus() }
+        .onReceive(timer) { _ in
+            if status != .finding { updateDeviceStatus() }
+        }
         .sheet(isPresented: $showPasswordSheet, onDismiss: {
             password = ""
             confirmation = ""
@@ -131,11 +141,13 @@ struct BackupEncryptionIndicatorView: View {
     }
 
     private func updateDeviceStatus() {
-        guard !isEnabling, let udid = vm.deviceIdentifier else { return }
+        guard !isEnabling, !isReadingStatus, let udid = vm.deviceIdentifier else { return }
+        isReadingStatus = true
         DispatchQueue.global(qos: .utility).async {
             let enabled = Self.readDeviceStatus(udid: udid)
             DispatchQueue.main.async {
-                guard !isEnabling else { return }
+                isReadingStatus = false
+                guard !isEnabling, vm.deviceIdentifier == udid else { return }
                 status = enabled.map { $0 ? .enabled : .disabled } ?? .unknown
                 vm.backupEncrypted = enabled ?? false
             }

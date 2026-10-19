@@ -71,7 +71,7 @@ struct BackupApplicationView: View {
                 openRestoreModeInfo = true
             } label: {
                 Text("Only Merge Restore can be used to install applications downloaded here.")
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(.tint)
                     .underline()
             }
             .buttonStyle(.plain)
@@ -107,7 +107,7 @@ struct BackupApplicationView: View {
                                     openSignIn = account
                                 } label: {
                                     Text("Sign In")
-                                        .foregroundStyle(.accent)
+                                        .foregroundStyle(.tint)
                                 }
                             }
                         }

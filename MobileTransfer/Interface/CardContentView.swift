@@ -17,7 +17,11 @@ struct CardContentView<V: View>: View {
         }
         .frame(maxWidth: .infinity)
         .padding(16)
-        .itmGlassSurface(cornerRadius: 18)
+        .background(Color(nsColor: .controlBackgroundColor), in: .rect(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(.primary.opacity(0.08), lineWidth: 1)
+        }
     }
 }
 

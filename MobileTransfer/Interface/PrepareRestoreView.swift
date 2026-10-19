@@ -49,7 +49,7 @@ struct PrepareRestoreView: View {
                 } label: {
                     CardContentView {
                         Text("Start Restore")
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(.tint)
                             .frame(maxWidth: .infinity)
                     }
                 }

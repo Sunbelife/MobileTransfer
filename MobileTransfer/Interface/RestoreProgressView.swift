@@ -72,7 +72,7 @@ struct RestoreProgressView: View {
         } label: {
             CardContentView {
                 Text("Done")
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(.tint)
                     .frame(maxWidth: .infinity)
             }
         }

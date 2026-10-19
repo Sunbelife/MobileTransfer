@@ -20,6 +20,18 @@ guard Security.validateAppSignature() else {
     Security.crashOut()
 }
 
+#if DEBUG
+if CommandLine.arguments.contains("--verify-device-presentation") {
+    let valid = DeviceInformationPresentation.verify() && DeviceBatteryStatus.verify()
+    print("DEVICE_PRESENTATION verified=\(valid)")
+    exit(valid ? 0 : 1)
+}
+if CommandLine.arguments.contains("--benchmark-device-reads") {
+    DeviceReadBenchmark.run()
+    exit(0)
+}
+#endif
+
 DiggerManager.shared.maxConcurrentTasksCount = 32
 DiggerManager.shared.timeout = 60
 DiggerCache.cleanDownloadFiles()

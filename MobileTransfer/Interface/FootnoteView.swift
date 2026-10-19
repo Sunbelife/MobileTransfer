@@ -36,7 +36,7 @@ struct FootnoteView: View {
                     vm.page = .welcome
                 } label: {
                     Text("Back")
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(.tint)
                         .frame(maxWidth: .infinity)
                         .contentShape(Rectangle())
                 }
