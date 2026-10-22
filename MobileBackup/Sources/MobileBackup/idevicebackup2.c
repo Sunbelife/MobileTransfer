@@ -118,8 +118,10 @@ static void notify_cb(const char *notification, void *userdata)
 		backup_domain_changed = 1;
 	} else if (!strcmp(notification, "com.apple.LocalAuthentication.ui.presented")) {
 		passcode_requested = 1;
+		printf("ITM_AUTH_WAIT\n");
 	} else if (!strcmp(notification, "com.apple.LocalAuthentication.ui.dismissed")) {
 		passcode_requested = 0;
+		printf("ITM_AUTH_DISMISSED\n");
 	} else {
 		PRINT_VERBOSE(1, "Unhandled notification '%s' (TODO: implement)\n", notification);
 	}
@@ -2342,6 +2344,7 @@ checkpoint:
 					goto files_out;
 				}
 
+				printf("ITM_DEVICE_ACTIVE\n");
 				if (!strcmp(dlmsg, "DLMessageDownloadFiles")) {
 					/* device wants to download files from the computer */
 					mb2_set_overall_progress_from_message(message, dlmsg);

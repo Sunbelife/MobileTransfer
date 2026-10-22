@@ -36,6 +36,8 @@ public extension AppleMobileDeviceManager {
                     "CFBundleIdentifier",
                     "CFBundleShortVersionString",
                     "CFBundleDisplayName",
+                    "StaticDiskUsage",
+                    "DynamicDiskUsage",
                     "ApplicationSINF",
                     "iTunesMetadata",
                 ], // looks like that's all, really is?
@@ -112,6 +114,25 @@ public extension AppleMobileDeviceManager {
         }
         guard fullyDecoded else { return nil }
         return applicationDic
+    }
+
+    /// Device usage is a dated snapshot, not the size of encrypted archive files.
+    func applicationUsageSnapshot(udid: String) -> [String: Any]? {
+        guard let apps = listApplications(udid: udid, connection: .usb, includeIcons: false),
+              let data = try? PropertyListEncoder().encode(apps),
+              let decoded = (try? PropertyListSerialization.propertyList(from: data, format: nil)) as? [String: [String: Any]]
+        else { return nil }
+        var sizes: [String: [String: Int64]] = [:]
+        for (identifier, app) in decoded {
+            var entry: [String: Int64] = [:]
+            for key in ["StaticDiskUsage", "DynamicDiskUsage"] {
+                if let number = app[key] as? NSNumber, number.int64Value >= 0 {
+                    entry[key] = number.int64Value
+                }
+            }
+            if !entry.isEmpty { sizes[identifier] = entry }
+        }
+        return ["DeviceIdentifier": udid, "CapturedAt": Date(), "Applications": sizes]
     }
 
     /// Streams icons after the app list is available, reusing one SpringBoard service.

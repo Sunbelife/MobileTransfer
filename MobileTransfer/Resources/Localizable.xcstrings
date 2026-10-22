@@ -1002,12 +1002,12 @@
         }
       }
     },
-    "Encrypted backups include saved passwords and Health data. Keep the backup password safe; it is required to restore the backup." : {
+    "Encrypted backups can also include saved passwords, Wi-Fi settings, website history, Health data, and call history. Keep the backup password safe; it is required to restore the backup." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "加密备份包含已保存的密码和“健康”数据。请妥善保管备份密码；恢复备份时必须使用该密码。"
+            "value" : "加密备份还可包含已保存的密码、Wi-Fi 设置、网站历史记录、“健康”数据和通话记录等敏感数据。请妥善保管备份密码，恢复时需要使用。"
           }
         }
       }

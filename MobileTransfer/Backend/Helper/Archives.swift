@@ -19,6 +19,13 @@ enum Archives {
         let url: URL
         let date: Date
         let deviceIdentifier: String
+        let deviceName: String
+        let modelName: String
+        let systemVersion: String
+
+        var displayName: String {
+            deviceName == modelName || deviceName.isEmpty ? modelName : [deviceName, modelName].filter { !$0.isEmpty }.joined(separator: " · ")
+        }
 
         var id: String { url.path }
     }
@@ -47,6 +54,65 @@ enum Archives {
             .sorted { $0.date > $1.date }
     }
 
+    /// Discovery only: validate the selected archive before preparing any update.
+    static func backupCandidates(for deviceIdentifier: String, searchComputer: Bool) -> [URL] {
+        var paths = UserDefaults.standard.stringArray(forKey: historyKey) ?? []
+        if searchComputer {
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/mdfind")
+            process.arguments = ["kMDItemFSName == '*.mobiletransfer'cd"]
+            let output = Pipe()
+            process.standardOutput = output
+            process.standardError = FileHandle.nullDevice
+            if (try? process.run()) != nil {
+                let data = output.fileHandleForReading.readDataToEndOfFile()
+                process.waitUntilExit()
+                if process.terminationStatus == 0 {
+                    paths += String(decoding: data, as: UTF8.self).split(separator: "\n").map(String.init)
+                }
+            }
+        }
+        return Set(paths.map { URL(fileURLWithPath: $0).standardizedFileURL }).filter { url in
+            guard let info = NSDictionary(contentsOf: url.appendingPathComponent("Info.plist")) as? [String: Any],
+                  let identifier = (info["Target Identifier"] as? String) ?? (info["Unique Identifier"] as? String)
+            else { return false }
+            return identifier.caseInsensitiveCompare(deviceIdentifier) == .orderedSame
+        }.sorted {
+            let left = (try? $0.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? .distantPast
+            let right = (try? $1.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? .distantPast
+            return left > right
+        }
+    }
+
+    static func latestBackupSource(in folder: URL, deviceIdentifier: String) throws -> BackupSource? {
+        let children = try FileManager.default.contentsOfDirectory(
+            at: folder, includingPropertiesForKeys: [.isSymbolicLinkKey], options: [.skipsHiddenFiles]
+        )
+        let latest = children.filter {
+            (try? $0.resourceValues(forKeys: [.isSymbolicLinkKey]))?.isSymbolicLink != true
+        }.compactMap { backupRecord(at: $0) }
+            .filter { $0.deviceIdentifier.caseInsensitiveCompare(deviceIdentifier) == .orderedSame }
+            .max { $0.date < $1.date }
+        guard let latest else { return nil }
+        return try inspectBackupSource(at: latest.url, deviceIdentifier: deviceIdentifier)
+    }
+
+    static func newBackupURL(in folder: URL, deviceName: String) -> URL {
+        let name = deviceName.replacingOccurrences(of: "/", with: "-")
+            .replacingOccurrences(of: ":", with: "-")
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd HH.mm.ss"
+        let base = "\(name) - \(formatter.string(from: Date()))"
+        var url = folder.appendingPathComponent(base).appendingPathExtension("mobiletransfer")
+        var index = 2
+        while FileManager.default.fileExists(atPath: url.path) {
+            url = folder.appendingPathComponent("\(base)-\(index)").appendingPathExtension("mobiletransfer")
+            index += 1
+        }
+        return url
+    }
+
     private static func backupRecord(at url: URL) -> BackupRecord? {
         guard url.pathExtension.lowercased() == "mobiletransfer",
               !FileManager.default.fileExists(atPath: url.appendingPathComponent(pendingMarkerName).path),
@@ -58,7 +124,12 @@ enum Archives {
         let date = (status["Date"] as? Date)
             ?? (try? url.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
             ?? .distantPast
-        return BackupRecord(url: url, date: date, deviceIdentifier: identifier)
+        let deviceName = info["Device Name"] as? String ?? ""
+        let productType = info["Product Type"] as? String ?? ""
+        let modelName = ConnectedDevice.modelNames[productType] ?? (productType.isEmpty ? "iPhone" : productType)
+        return BackupRecord(url: url, date: date, deviceIdentifier: identifier,
+                            deviceName: deviceName, modelName: modelName,
+                            systemVersion: info["Product Version"] as? String ?? "")
     }
 
     enum BackupSourceMode {
@@ -141,19 +212,7 @@ enum Archives {
             throw BackupSourceError.inUse
         }
 
-        let name = deviceName.replacingOccurrences(of: "/", with: "-")
-            .replacingOccurrences(of: ":", with: "-")
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyyMMdd-HHmmss"
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        let stamp = formatter.string(from: Date())
-        let parent = source.deletingLastPathComponent()
-        var destination = parent.appendingPathComponent("\(name)-\(stamp).mobiletransfer")
-        var index = 2
-        while FileManager.default.fileExists(atPath: destination.path) {
-            destination = parent.appendingPathComponent("\(name)-\(stamp)-\(index).mobiletransfer")
-            index += 1
-        }
+        let destination = newBackupURL(in: source.deletingLastPathComponent(), deviceName: deviceName)
 
         try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: false)
         do {

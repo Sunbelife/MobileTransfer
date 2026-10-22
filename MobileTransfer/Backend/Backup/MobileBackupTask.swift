@@ -118,7 +118,12 @@ class MobileBackupTask: Identifiable {
     }
 
     var error: BackupError?
+    var reportedErrors: [String] = []
     var hasStartedTransfer = false
+    var hasReportedOverallProgress = false
+    enum PreparationStage { case connecting, waitingForPasscode, preparing, responding }
+    var preparationStage: PreparationStage = .connecting
+    var lastActivity = Date()
     var currentSourceName: String?
 
     @ObservationIgnored
@@ -148,11 +153,13 @@ class MobileBackupTask: Identifiable {
 
     func start() {
         guard status == .initialized else { return }
+        guard error != .terminated else { status = .completed; return }
         status = .executing
         executeStart()
     }
 
     func terminate() {
+        guard !completed else { return }
         requiresMainThread { self.error = .terminated }
         defer { decodeOutput("Terminated by request.\n") }
         guard let pid else { return }
@@ -235,7 +242,10 @@ class MobileBackupTask: Identifiable {
             environment: [:],
             timeout: -1
         ) { pid in
-            requiresMainThread { self.pid = pid }
+            requiresMainThread {
+                self.pid = pid
+                if self.error == .terminated { kill(pid, SIGKILL) }
+            }
         } output: { output in
             self.decodeOutput(output)
         }
@@ -282,6 +292,25 @@ class MobileBackupTask: Identifiable {
         let line = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !line.isEmpty else { return }
 
+        if let message = Self.errorMessage(for: line) {
+            requiresMainThread {
+                if !self.reportedErrors.contains(message) { self.reportedErrors.append(message) }
+            }
+        }
+
+        if line.hasPrefix("ITM_AUTH_") || line == "ITM_DEVICE_ACTIVE" {
+            requiresMainThread {
+                self.lastActivity = Date()
+                switch line {
+                case "ITM_AUTH_WAIT": self.preparationStage = .waitingForPasscode
+                case "ITM_AUTH_DISMISSED": self.preparationStage = .preparing
+                case "ITM_DEVICE_ACTIVE": self.preparationStage = .responding
+                default: break
+                }
+            }
+            return
+        }
+
         if line == "ITM_BATCH_START" || line == "ITM_BATCH_END" {
             requiresMainThread {
                 if line == "ITM_BATCH_START" { self.hasStartedTransfer = true }
@@ -309,7 +338,11 @@ class MobileBackupTask: Identifiable {
             let prog = Progress(totalUnitCount: 100)
             prog.completedUnitCount = Int64(value)
             guard overall != prog else { return }
-            requiresMainThread { self.overall = prog }
+            requiresMainThread {
+                self.hasStartedTransfer = true
+                self.hasReportedOverallProgress = true
+                self.overall = prog
+            }
             return
         }
 
@@ -337,9 +370,57 @@ class MobileBackupTask: Identifiable {
         }
 
         guard !line.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        requiresMainThread { self.lastActivity = Date() }
         NSLog("[BackupTask] \(id) \(line)")
         requiresMainThread { self.output.append(.init(text: line)) }
     }
+
+    static func errorMessage(for line: String) -> String? {
+        let lower = line.lowercased()
+        guard lower.contains("error") || lower.contains("failed") || lower.contains("fatal")
+                || lower.contains("could not") || lower.contains("cannot ") || lower.contains("denied") else { return nil }
+        if lower.contains("insufficient free disk space") || lower.contains("error code 105") || lower.contains("errorcode 105") {
+            return "备份磁盘空间不足（错误 105）。请更换备份位置或释放磁盘空间后重试。"
+        }
+        if lower.contains("permission denied") {
+            return "没有访问权限。请检查备份位置的读写权限。\n" + line
+        }
+        if lower.contains("device") && (lower.contains("not found") || lower.contains("disconnected")) {
+            return "设备未连接。请检查连接线并解锁 iPhone。\n" + line
+        }
+        if lower.contains("timeout") || lower.contains("timed out") {
+            return "等待设备响应超时。请检查 iPhone 上的提示和设备连接。\n" + line
+        }
+        return line
+    }
+
+    #if DEBUG
+    static func verifyPreparationEvents() -> Bool {
+        let task = MobileBackupTask(config: .init(
+            device: .init(udid: "test", deviceRecord: .init(), pairRecord: .init(), extra: [:], possibleNetworkAddress: []),
+            useNetwork: false, useStoreBase: FileManager.default.temporaryDirectory
+        ))
+        task.decodeLine("ErrorCode 105: Insufficient free disk space on drive to back up (MBErrorDomain/105)")
+        task.decodeLine("Backup Failed (Error Code 105).")
+        task.decodeLine("ERROR: sample unknown error 999")
+        guard task.reportedErrors.count == 2,
+              task.reportedErrors[0].contains("105"), task.reportedErrors[1].contains("999") else { return false }
+        task.decodeLine("ITM_AUTH_WAIT")
+        guard task.preparationStage == .waitingForPasscode else { return false }
+        task.decodeLine("ITM_AUTH_DISMISSED")
+        guard task.preparationStage == .preparing, !task.hasStartedTransfer else { return false }
+        task.decodeLine("ITM_DEVICE_ACTIVE")
+        guard task.preparationStage == .responding else { return false }
+        task.decodeLine("ITM_BATCH_START")
+        guard task.hasStartedTransfer, !task.hasReportedOverallProgress else { return false }
+        task.decodeLine("[=====] 80% (8 MB/10 MB)")
+        guard !task.hasReportedOverallProgress else { return false }
+        task.decodeLine("[=====] 80% Finished")
+        guard task.hasReportedOverallProgress, task.overall.completedUnitCount == 80 else { return false }
+        task.decodeLine("ITM_BATCH_END")
+        return task.hasReportedOverallProgress && task.overall.completedUnitCount == 80
+    }
+    #endif
 
     private static func decodeDomain(_ encoded: Substring) -> String? {
         let hex = Array(encoded.utf8)

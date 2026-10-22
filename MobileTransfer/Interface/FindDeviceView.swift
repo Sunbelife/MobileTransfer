@@ -38,7 +38,7 @@ struct ConnectedDevice: Codable, Identifiable, Hashable, Equatable {
         return deviceRecord?.deviceClass
     }
 
-    private static let modelNames: [String: String] = [
+    static let modelNames: [String: String] = [
         "iPhone12,1": "iPhone 11",
         "iPhone12,3": "iPhone 11 Pro",
         "iPhone12,5": "iPhone 11 Pro Max",

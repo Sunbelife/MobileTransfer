@@ -31,7 +31,7 @@ struct ContentView: View {
                     )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            if !isDeviceBrowser {
+            if !isDeviceBrowser && vm.page != .backupProgress && vm.page != .restoreProgress {
                 FootnoteView()
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)

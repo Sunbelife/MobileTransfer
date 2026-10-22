@@ -12,10 +12,12 @@ enum DeviceReadBenchmark {
         let usbCount = identifiers.filter { manager.remoteDeviceHandlerIdentifier(udid: $0, connection: .usb) != nil }.count
         let networkCount = identifiers.filter { manager.remoteDeviceHandlerIdentifier(udid: $0, connection: .net) != nil }.count
         print("DEVICE_BENCH transport_usb=\(usbCount) transport_network=\(networkCount) enumerated=\(identifiers.count)")
-        guard identifiers.count == 1, let udid = identifiers.first else {
+        let usbIdentifiers = identifiers.filter { manager.remoteDeviceHandlerIdentifier(udid: $0, connection: .usb) != nil }
+        guard usbIdentifiers.count == 1, let udid = usbIdentifiers.first else {
             print("DEVICE_BENCH requires exactly one connected device")
             return
         }
+        print("DEVICE_BENCH encryption_native=\(String(describing: manager.readBackupEncryptionStatus(udid: udid)))")
         let start = DispatchTime.now().uptimeNanoseconds
         let record = measure("device_record") { manager.obtainDeviceInfo(udid: udid, connection: .usb) }
         if CommandLine.arguments.contains("--batched") {

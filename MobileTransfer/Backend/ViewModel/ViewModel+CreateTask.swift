@@ -138,7 +138,7 @@ extension ViewModel {
     }
 
     func pickRestoreArchive() {
-        guard let window = NSApp.windows.first else { return }
+        guard let window = NSApp.keyWindow else { return }
 
         let panel = NSOpenPanel()
         panel.canChooseFiles = true

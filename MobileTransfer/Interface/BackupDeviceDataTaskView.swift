@@ -13,7 +13,7 @@ struct BackupDeviceDataTaskView: View {
     @State private var showingDetails = false
 
     private var hasOverallProgress: Bool {
-        task.overall.completedUnitCount > 0
+        task.hasReportedOverallProgress
     }
 
     private var overallPercent: String {
@@ -38,79 +38,82 @@ struct BackupDeviceDataTaskView: View {
         return "\(received) / \(total)"
     }
 
-    var body: some View {
-        CardContentView {
-            HStack(spacing: 10) {
-                Image(systemName: "arrow.right.doc.on.clipboard")
-                    .accessibilityHidden(true)
-                Text("Backup")
-                    .bold()
-                Spacer()
-                if task.completed {
-                    Image(systemName: task.success ? "checkmark.circle.fill" : "xmark.circle.fill")
-                        .foregroundStyle(task.success ? .green : .red)
-                        .accessibilityHidden(true)
-                } else if hasOverallProgress {
-                    HStack(spacing: 4) {
-                        Text("Overall")
-                        Text(overallPercent)
-                            .monospacedDigit()
-                    }
-                }
-                Button {
-                    showingDetails = true
-                } label: {
-                    Image(systemName: "exclamationmark.circle")
-                        .font(.title3)
-                }
-                .buttonStyle(.plain)
-                .help("View backup details")
-                .accessibilityLabel("View backup details")
-                .popover(isPresented: $showingDetails, arrowEdge: .trailing) {
-                    details
-                }
-            }
-
-            VStack(alignment: .leading, spacing: 18) {
-                HStack(alignment: .firstTextBaseline) {
-                    status
-                        .font(.title2.weight(.semibold))
-                    Spacer()
-                    if !task.completed, hasCurrentProgress {
-                        Text("Current batch \(currentPercent)")
-                            .font(.headline.monospacedDigit())
-                    }
-                }
-
-                Group {
-                    if task.completed {
-                        ProgressView(
-                            value: Double(task.overall.completedUnitCount),
-                            total: Double(max(task.overall.totalUnitCount, 1))
-                        )
-                    } else if hasCurrentProgress {
-                        ProgressView(
-                            value: Double(task.current.completedUnitCount),
-                            total: Double(max(task.current.totalUnitCount, 1))
-                        )
-                    } else {
-                        ProgressView()
-                    }
-                }
-                .progressViewStyle(.linear)
-                .controlSize(.large)
-                .tint(.accentColor)
-                .scaleEffect(x: 1, y: 2.5)
-                .frame(height: 18)
-
-                supportingText
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 24)
+    @ViewBuilder var body: some View {
+        if task.completed && !task.success {
+            failureContent
+        } else {
+            progressContent
         }
-        .frame(maxWidth: 760)
+    }
+
+    private var failureContent: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            HStack(alignment: .top, spacing: 14) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.title)
+                    .foregroundStyle(.orange)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("备份未完成").font(.title3.weight(.semibold))
+                    Text("请处理以下问题后重新备份。")
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+            }
+            Divider()
+            if task.reportedErrors.count > 3 {
+                ScrollView { errorRows }.frame(height: 220)
+            } else {
+                errorRows
+            }
+            Text("未完成的备份不能用于恢复。")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+            HStack {
+                Button("查看日志") { showingDetails = true }
+                    .popover(isPresented: $showingDetails) { details }
+                Spacer()
+            }
+            .buttonStyle(.bordered)
+        }
+        .padding(24)
+        .frame(maxWidth: 520)
+        .background(Color(nsColor: .controlBackgroundColor), in: .rect(cornerRadius: 12))
+        .overlay { RoundedRectangle(cornerRadius: 12).strokeBorder(.separator, lineWidth: 0.5) }
+    }
+
+    private var errorRows: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            if task.reportedErrors.isEmpty {
+                Text("备份工具未提供具体原因。请查看详细日志。")
+            } else {
+                ForEach(task.reportedErrors, id: \.self) { message in
+                    Text(verbatim: message)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .textSelection(.enabled)
+                    if message != task.reportedErrors.last { Divider() }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var progressContent: some View {
+        TransferProgressCard(title: "Backup", progress: hasOverallProgress ? task.overall.fractionCompleted : nil,
+                             onDetails: { showingDetails = true }) {
+            status
+        } supplement: {
+            if let currentTransfer, !task.completed {
+                Text(currentTransfer).font(.subheadline.monospacedDigit()).foregroundStyle(.secondary)
+            }
+            if !task.completed, !task.reportedErrors.isEmpty {
+                ForEach(task.reportedErrors, id: \.self) { message in
+                    Text(verbatim: message).foregroundStyle(.red).textSelection(.enabled)
+                }
+            }
+        }
+        .popover(isPresented: $showingDetails) { details }
     }
 
     @ViewBuilder
@@ -122,6 +125,8 @@ struct BackupDeviceDataTaskView: View {
                 Text("Backup failed")
                     .foregroundStyle(.red)
             }
+        } else if task.hasReportedOverallProgress && task.overall.fractionCompleted >= 1 {
+            Text("正在完成备份…")
         } else if task.hasStartedTransfer {
             if let sourceName = task.currentSourceName {
                 Text("Backing up \(sourceName)…")
@@ -129,23 +134,12 @@ struct BackupDeviceDataTaskView: View {
                 Text("Transferring device data…")
             }
         } else {
-            Text("Preparing data on iPhone…")
-        }
-    }
-
-    @ViewBuilder
-    private var supportingText: some View {
-        if task.completed {
-            if task.success {
-                Text("Device data has been received.")
-            } else {
-                Text("Open details to see what happened.")
+            switch task.preparationStage {
+            case .connecting: Text("准备开始备份…")
+            case .waitingForPasscode: Text("请在 iPhone 上输入锁屏密码")
+            case .preparing: Text("准备开始备份…")
+            case .responding: Text("准备开始备份…")
             }
-        } else if let currentTransfer {
-            Text(currentTransfer)
-                .monospacedDigit()
-        } else {
-            Text("The first backup may take a few minutes to prepare. Confirm any prompt on your iPhone.")
         }
     }
 
@@ -184,5 +178,63 @@ private extension MobileBackupTask.Log {
             return .orange
         }
         return .primary
+    }
+}
+
+/// Both operations share the native progress presentation. Unknown progress is a spinner.
+struct TransferProgressCard<Status: View, Supplement: View>: View {
+    let title: LocalizedStringKey
+    let progress: Double?
+    let onDetails: () -> Void
+    @ViewBuilder let status: Status
+    @ViewBuilder let supplement: Supplement
+
+    var body: some View {
+        CardContentView {
+            HStack {
+                Image(systemName: "arrow.right.doc.on.clipboard").accessibilityHidden(true)
+                Text(title).bold()
+                Spacer()
+                if let progress {
+                    Text("传输进度 \(Int(min(1, max(0, progress)) * 100))%")
+                        .font(.callout.monospacedDigit()).foregroundStyle(.secondary)
+                }
+                Button(action: onDetails) { Image(systemName: "info.circle") }
+                    .buttonStyle(.plain).help("查看日志").accessibilityLabel("查看日志")
+            }
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(spacing: 10) {
+                    if progress == nil { ProgressView().progressViewStyle(.circular).controlSize(.small) }
+                    status.font(.headline)
+                }
+                if let progress {
+                    ProgressView(value: min(1, max(0, progress))).progressViewStyle(.linear)
+                }
+                supplement
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 12)
+        }
+        .frame(maxWidth: 560)
+    }
+}
+
+struct TransferResultView: View {
+    let title: String
+    var message: String? = nil
+    var success = true
+    let onDone: () -> Void
+
+    var body: some View {
+        VStack(spacing: 24) {
+            Image(systemName: success ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                .font(.system(size: 64)).foregroundStyle(success ? .green : .orange)
+                .accessibilityHidden(true)
+            Text(title).font(.title2.weight(.semibold))
+            if let message { Text(message).foregroundStyle(.secondary).multilineTextAlignment(.center) }
+            Button("完成", action: onDone).buttonStyle(.borderedProminent).keyboardShortcut(.defaultAction)
+        }
+        .padding(32)
+        .frame(maxWidth: 560)
     }
 }

@@ -116,6 +116,16 @@ struct DeviceBrowserView: View {
                 activate(selectedDevice)
             }
         }
+        .sheet(isPresented: Binding(
+            get: { vm.page == .prepareRestore },
+            set: { presented in
+                if !presented && vm.page == .prepareRestore {
+                    vm.restorePassword = ""
+                    vm.mode = .backup
+                    vm.page = .prepareBackup
+                }
+            }
+        )) { PrepareRestoreView() }
         .sheet(isPresented: $showingTrust, onDismiss: scan) {
             DeviceTrustView()
         }
@@ -146,15 +156,8 @@ struct DeviceBrowserView: View {
                     }
                 }
             } else if vm.deviceIdentifier == device.id {
-                if vm.page == .prepareRestore {
-                    PrepareRestoreView()
-                        .id(device.id)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding(.top, 24)
-                } else {
-                    PrepareBackupView { deviceBusy = $0 }
-                        .id(device.id)
-                }
+                PrepareBackupView { deviceBusy = $0 }
+                    .id(device.id)
             } else {
                 ProgressView("Reading device information…")
             }

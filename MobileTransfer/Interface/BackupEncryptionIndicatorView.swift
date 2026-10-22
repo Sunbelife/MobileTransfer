@@ -56,7 +56,7 @@ struct BackupEncryptionIndicatorView: View {
                 }
             }
 
-            Text("Encrypted backups include saved passwords and Health data. Keep the backup password safe; it is required to restore the backup.")
+            Text("Encrypted backups can also include saved passwords, Wi-Fi settings, website history, Health data, and call history. Keep the backup password safe; it is required to restore the backup.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
@@ -64,8 +64,12 @@ struct BackupEncryptionIndicatorView: View {
                 Text("Enabling backup encryption… Confirm on your device if asked.")
                     .foregroundStyle(.secondary)
             } else if status == .unknown {
-                Text("Could not check backup encryption. Reconnect the device and try again.")
-                    .foregroundStyle(.orange)
+                HStack {
+                    Text("无法读取加密状态，请解锁设备后重试。")
+                        .foregroundStyle(.orange)
+                    Button("重试") { updateDeviceStatus() }
+                        .disabled(isReadingStatus)
+                }
             }
         }
         .onReceive(timer) { _ in
@@ -154,13 +158,7 @@ struct BackupEncryptionIndicatorView: View {
         }
     }
 
-    private static func readDeviceStatus(udid: String) -> Bool? {
-        guard let read = AppleMobileDeviceManager.shared.readFromLockdown(
-            udid: udid,
-            domain: "com.apple.mobile.backup",
-            key: nil,
-            connection: .usb
-        ), let values = read.value as? [String: Any] else { return nil }
-        return values["WillEncrypt"] as? Bool
+    static func readDeviceStatus(udid: String) -> Bool? {
+        AppleMobileDeviceManager.shared.readBackupEncryptionStatus(udid: udid)
     }
 }

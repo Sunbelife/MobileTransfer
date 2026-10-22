@@ -13,81 +13,37 @@ struct RestoreArchivePickerView: View {
     @State private var loading = true
     @State private var checkingPath: String?
 
+    var onCheckingChange: (Bool) -> Void = { _ in }
+
     var body: some View {
-        CardContentView {
-            CardContentHeader(icon: "archivebox", title: "Backup History") {
-                if vm.restoreLocation != nil {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                }
-            }
-
-            if let selected = vm.restoreLocation {
-                Text("Selected backup")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text(URL(fileURLWithPath: selected).lastPathComponent)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-            }
-
-            if loading {
-                ProgressView("Finding backups…")
-            } else if backups.isEmpty {
-                Text("No completed backup found for this device.")
-                    .foregroundStyle(.secondary)
-            } else {
-                VStack(spacing: 8) {
-                    ForEach(backups.indices, id: \.self) { index in
-                        let backup = backups[index]
-                        Button {
-                            select(backup)
-                        } label: {
-                            HStack(spacing: 12) {
-                                Image(systemName: "clock.arrow.circlepath")
-                                VStack(alignment: .leading, spacing: 3) {
-                                    if index == 0 {
-                                        Text("Latest backup")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    Text(backup.date.formatted(date: .abbreviated, time: .shortened))
-                                        .font(.headline)
-                                    Text(backup.url.lastPathComponent)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                        .lineLimit(1)
-                                        .truncationMode(.middle)
-                                }
-                                Spacer()
-                                if checkingPath == backup.id {
-                                    ProgressView()
-                                        .controlSize(.small)
-                                } else {
-                                    Image(systemName: "chevron.right")
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(checkingPath != nil)
-                        if index < backups.count - 1 { Divider() }
-                    }
-                }
-            }
-
-            Divider()
+        VStack(alignment: .leading, spacing: 10) {
+            Text("选择备份").font(.headline)
             HStack {
-                Button("Choose Backup from File…") { vm.pickRestoreArchive() }
-                Button("Show In Finder") { vm.showRestoreBackupLocationInFinder() }
-                    .disabled(vm.restoreLocation == nil)
-                Spacer()
+                Menu {
+                    ForEach(backups) { backup in
+                        Button("\(backup.displayName) · \(backup.date.formatted(date: .abbreviated, time: .shortened))") { select(backup) }
+                    }
+                } label: {
+                    Text(selectedDescription).lineLimit(2)
+                }
+                .disabled(loading || checkingPath != nil || backups.isEmpty)
+                if loading || checkingPath != nil { ProgressView().controlSize(.small) }
+                Button("从文件选择…") { vm.pickRestoreArchive() }.disabled(checkingPath != nil)
+            }
+            if let path = vm.restoreLocation {
+                Text(path).font(.caption).foregroundStyle(.secondary).lineLimit(2).textSelection(.enabled)
             }
         }
         .onAppear(perform: loadHistory)
-        .onChange(of: vm.restoreLocation) { _, _ in loadHistory() }
+        .onChange(of: vm.restoreLocation) { loadHistory() }
+        .onChange(of: checkingPath) { onCheckingChange(checkingPath != nil) }
+    }
+
+    private var selectedDescription: String {
+        if let record = backups.first(where: { $0.url.path == vm.restoreLocation }) {
+            return "\(record.displayName) · \(record.date.formatted(date: .abbreviated, time: .shortened))"
+        }
+        return vm.restoreLocation.map { URL(fileURLWithPath: $0).lastPathComponent } ?? "选择备份…"
     }
 
     private func loadHistory() {
@@ -112,6 +68,7 @@ struct RestoreArchivePickerView: View {
                     Archives.presentArchiveBroken(info: info)
                     return
                 }
+                vm.restorePassword = ""
                 vm.restoreLocation = backup.url.path
                 vm.restoreArchiveIsPasswordProtected = info.isEncrypted
                 vm.restoreApplicationsCount = info.applications

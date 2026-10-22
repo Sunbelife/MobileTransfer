@@ -46,20 +46,5 @@ extension MobileTransfer {
                 }
             }
         }
-        if vm.page == .prepareBackup, vm.deviceIdentifier != nil {
-            CommandMenu("Advanced") {
-                if vm.showAppPackageDownloadPanel {
-                    Button("Hide Download App Option (Experimental)") {
-                        vm.showAppPackageDownloadPanel = false
-                        vm.backupApps = false
-                    }
-                } else {
-                    Button("Show Download App Option (Experimental)") {
-                        vm.showAppPackageDownloadPanel = true
-                        vm.backupApps = true
-                    }
-                }
-            }
-        }
     }
 }

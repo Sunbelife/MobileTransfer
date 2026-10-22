@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C5E3206410A94FBF91FE6021 /* ITMIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C5E3206410A94FBF91FE6022 /* ITMIcon.icon */; };
 		5046A1EC2CC82286003A8D9E /* WindowAnimation in Frameworks */ = {isa = PBXBuildFile; productRef = 5046A1EB2CC82286003A8D9E /* WindowAnimation */; };
 		505386712CA3B89F0087A63A /* AuxiliaryExecute in Frameworks */ = {isa = PBXBuildFile; productRef = 505386702CA3B89F0087A63A /* AuxiliaryExecute */; };
 		505386742CA3B8AF0087A63A /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 505386732CA3B8AF0087A63A /* ColorfulX */; };
@@ -28,6 +29,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C5E3206410A94FBF91FE6022 /* ITMIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.icon; path = ITMIcon.icon; sourceTree = "<group>"; };
 		505386782CA3BBAB0087A63A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		505386A42CA3CB560087A63A /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		505386A62CA3CB5D0087A63A /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
@@ -143,6 +145,7 @@
 			isa = PBXGroup;
 			children = (
 				505F4C172CA2E86F008BE817 /* Assets.xcassets */,
+				C5E3206410A94FBF91FE6022 /* ITMIcon.icon */,
 				50A7D5C82CA5055400A9CBFB /* iTM.icns */,
 				507CF2BD2CA69FA200B581CF /* License.txt */,
 				507CF2C82CA6A94300B581CF /* PrivacyPolicy.txt */,
@@ -162,6 +165,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 505F4BDE2CA2E70B008BE817 /* Build configuration list for PBXNativeTarget "MobileTransfer" */;
 			buildPhases = (
+				A10000000000000000000010 /* Apple verification helper */,
 				505F4BCB2CA2E709008BE817 /* Sources */,
 				505F4BCC2CA2E709008BE817 /* Frameworks */,
 				505F4BCD2CA2E709008BE817 /* Resources */,
@@ -253,6 +257,7 @@
 				505386A52CA3CB560087A63A /* Localizable.xcstrings in Resources */,
 				507CF2C92CA6A94300B581CF /* PrivacyPolicy.txt in Resources */,
 				505F4C202CA2E86F008BE817 /* Assets.xcassets in Resources */,
+				C5E3206410A94FBF91FE6021 /* ITMIcon.icon in Resources */,
 				50A7D5C92CA5055400A9CBFB /* iTM.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -298,6 +303,21 @@
 			shellPath = /bin/sh;
 			shellScript = "./MobileTransfer/Resources/EmbedMobileInstall.sh\n";
 		};
+/* End PBXShellScriptBuildPhase section */
+
+
+/* Begin PBXShellScriptBuildPhase section */
+        A10000000000000000000010 /* Apple verification helper */ = {
+            isa = PBXShellScriptBuildPhase;
+            buildActionMask = 2147483647;
+            files = ();
+            inputPaths = ("$(SRCROOT)/Tools/SystemStoreAuthentication/main.m", "$(SRCROOT)/Tools/AppleIDChallenge/main.go", "$(SRCROOT)/Tools/AppleIDChallenge/betacat_signin.go", "$(SRCROOT)/Tools/AppleIDChallenge/srp.go", "$(SRCROOT)/Tools/AppleIDChallenge/build.sh");
+            name = "Apple verification helper";
+            outputPaths = ("$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Helpers/itm-apple-challenge", "$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Helpers/itm-system-store-auth");
+            runOnlyForDeploymentPostprocessing = 0;
+            shellPath = /bin/sh;
+            shellScript = "\"$SRCROOT/Tools/AppleIDChallenge/build.sh\"";
+        };
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -463,7 +483,7 @@
 		505F4BDF2CA2E70B008BE817 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = ITMIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = MobileTransfer/Entitlements.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -505,7 +525,7 @@
 		505F4BE02CA2E70B008BE817 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = ITMIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = MobileTransfer/Entitlements.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -623,13 +643,9 @@
 				minimumVersion = 1.1.0;
 			};
 		};
-		50C18C502CA4079600F9F428 /* XCRemoteSwiftPackageReference "ApplePackage" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Lakr233/ApplePackage.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.3;
-			};
+		50C18C502CA4079600F9F428 /* ApplePackage */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Vendor/ApplePackage;
 		};
 		50F485312CA3CEE10000FEF6 /* XCRemoteSwiftPackageReference "AppleMobileDeviceLibrary" */ = {
 			isa = XCRemoteSwiftPackageReference;

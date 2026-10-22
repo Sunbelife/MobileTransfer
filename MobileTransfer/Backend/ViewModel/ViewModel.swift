@@ -63,20 +63,7 @@ class ViewModel {
 
     var backupTask: BackupTask?
 
-    // disabled by default due to recent api changes on Apple's server side
-    @ObservationIgnored
-    private var _showAppPackageDownloadPanel = StoredValue(key: "tech.nootag.itm.showAppPackageDownloadPanel", defaultValue: false)
-    var showAppPackageDownloadPanel: Bool {
-        get {
-            access(keyPath: \.showAppPackageDownloadPanel)
-            return _showAppPackageDownloadPanel.get()
-        }
-        set {
-            withMutation(keyPath: \.showAppPackageDownloadPanel) {
-                _showAppPackageDownloadPanel.set(newValue)
-            }
-        }
-    }
+
 
     // MARK: - restore
 
@@ -146,7 +133,7 @@ class ViewModel {
         selectedDeviceIcon = "iphone"
         selectedDeviceRecord = nil
         mode = .unspecified
-        backupApps = showAppPackageDownloadPanel
+        backupApps = false
         backupEncrypted = false
         backupApplicationList = []
         backupApplicationAccountAllowed = []
